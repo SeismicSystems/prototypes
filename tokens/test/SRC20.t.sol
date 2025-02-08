@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
 import {SRC20} from "../src/SRC20.sol";
-import {IERC20Errors} from "../openzeppelin/interfaces/draft-IERC6093.sol";
+import {IERC20Errors} from "../lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
 
 contract TestSRC20 is SRC20 {
     constructor(string memory name, string memory symbol) SRC20(name, symbol) {}

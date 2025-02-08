@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
 import {USDY} from "../../src/USDY.sol";
-import {IERC20Errors} from "../../openzeppelin/interfaces/draft-IERC6093.sol";
+import {IERC20Errors} from "../../lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
 
 contract USDYYieldTest is Test {
     USDY public token;
