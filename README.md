@@ -15,10 +15,8 @@ Each project in this repo lives in its own directory and includes a dedicated RE
 
 Below is a quick summary of each prototype currently available in this repository:
 
-1. **`Project 1 here`**  
-   Description here.
-2. **`Project 2 here`**  
-   Description here.
+1. **`LEVEL`**  
+   Stabilize your DePIN service.
 
 
 ## Contributing

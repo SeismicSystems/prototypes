@@ -1,10 +1,8 @@
-# Level Protocol
-
-> Stabilize your depin service
+# LEVEL Protocol
 
 ## Overview
 
-Level Protocol provides price stability for Decentralized Physical Infrastructure Networks (DePIN) to ensure consistent service quality and network growth.
+LEVEL provides price stability for Decentralized Physical Infrastructure Networks (DePIN) to ensure consistent service quality and network growth.
 
 ### Problem
 
