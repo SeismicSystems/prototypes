@@ -120,6 +120,11 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
      * NOTE: If `value` is the maximum `suint256`, the allowance is not updated on
      * `transferFrom`. This is semantically equivalent to an infinite approval.
      *
+     * WARNING: Changing an allowance with this method can have security implications. When changing an approved
+     * allowance to a specific value, a race condition may occur if another transaction is submitted before
+     * the original allowance change is mined. To safely adjust allowances, use {increaseAllowance} and
+     * {decreaseAllowance} which provide atomic operations protected against such race conditions.
+     *
      * Requirements:
      *
      * - `spender` cannot be the zero address.
