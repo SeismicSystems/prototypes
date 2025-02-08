@@ -288,7 +288,7 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
             }
         }
 
-        emitTransfer(address(from), address(to), 0);
+        emitTransfer(address(from), address(to), uint256(value));
 
         _afterTokenTransfer(from, to, value);
     }

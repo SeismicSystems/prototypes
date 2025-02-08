@@ -187,7 +187,7 @@ contract SRC20Test is Test {
         uint256 transferAmount = 50 * 10**18;
         
         vm.expectEmit(true, true, false, true);
-        emit Transfer(initialHolder, recipient, 0);
+        emit Transfer(initialHolder, recipient, transferAmount);
         
         vm.prank(initialHolder);
         token.transfer(saddress(recipient), suint256(transferAmount));
@@ -197,7 +197,7 @@ contract SRC20Test is Test {
         uint256 mintAmount = 100 * 10**18;
         
         vm.expectEmit(true, true, false, true);
-        emit Transfer(address(0), recipient, 0);
+        emit Transfer(address(0), recipient, mintAmount);
         
         token.mint(saddress(recipient), suint256(mintAmount));
     }
@@ -206,7 +206,7 @@ contract SRC20Test is Test {
         uint256 burnAmount = 50 * 10**18;
         
         vm.expectEmit(true, true, false, true);
-        emit Transfer(initialHolder, address(0), 0);
+        emit Transfer(initialHolder, address(0), burnAmount);
         
         token.burn(saddress(initialHolder), suint256(burnAmount));
     }
@@ -219,7 +219,7 @@ contract SRC20Test is Test {
         token.approve(saddress(recipient), suint256(transferAmount));
         
         vm.expectEmit(true, true, false, true);
-        emit Transfer(initialHolder, anotherAccount, 0);
+        emit Transfer(initialHolder, anotherAccount, transferAmount);
         
         vm.prank(recipient);
         token.transferFrom(saddress(initialHolder), saddress(anotherAccount), suint256(transferAmount));
@@ -255,7 +255,7 @@ contract SRC20Test is Test {
         token.approve(saddress(recipient), suint256(type(uint256).max));
 
         vm.expectEmit(true, true, false, true);
-        emit Transfer(initialHolder, anotherAccount, 0);
+        emit Transfer(initialHolder, anotherAccount, 50 * 10**18);
         
         vm.prank(recipient);
         token.transferFrom(saddress(initialHolder), saddress(anotherAccount), suint256(50 * 10**18));
