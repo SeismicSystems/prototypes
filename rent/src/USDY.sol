@@ -42,6 +42,8 @@ contract USDY is SRC20 {
     event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);
     event Paused(address account);
     event Unpaused(address account);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 
     // Custom errors
     error InvalidRewardMultiplier(uint256 multiplier);
@@ -365,7 +367,7 @@ contract USDY is SRC20 {
 
     /**
      * @notice This is the exact same implementation as the one in SRC20.sol
-     * @dev See {SIRC20-allowance}.
+     * @dev See {ISRC20-allowance}.
      * Returns actual allowance if caller is either the owner or the spender,
      * returns 0 otherwise to maintain privacy.
      */
@@ -393,7 +395,7 @@ contract USDY is SRC20 {
         }
 
         _allowances[saddress(owner)][spender] = amount;
-        emit Approval(owner, address(spender), uint256(amount));
+        emitApproval(owner, address(spender), uint256(amount));
 
         return true;
     }
@@ -413,7 +415,7 @@ contract USDY is SRC20 {
         unchecked {
             _allowances[saddress(owner)][spender] += addedValue;
         }
-        emit Approval(owner, address(spender), uint256(_allowances[saddress(owner)][spender]));
+        emitApproval(owner, address(spender), uint256(_allowances[saddress(owner)][spender]));
 
         return true;
     }
@@ -437,8 +439,17 @@ contract USDY is SRC20 {
         unchecked {
             _allowances[saddress(owner)][spender] = currentAllowance - subtractedValue;
         }
-        emit Approval(owner, address(spender), uint256(_allowances[saddress(owner)][spender]));
+        emitApproval(owner, address(spender), uint256(_allowances[saddress(owner)][spender]));
 
         return true;
+    }
+
+    // Override the event emission functions to emit actual events
+    function emitTransfer(address from, address to, uint256 value) public virtual override {
+        emit Transfer(from, to, value);
+    }
+
+    function emitApproval(address owner, address spender, uint256 value) public virtual override {
+        emit Approval(owner, spender, value);
     }
 }

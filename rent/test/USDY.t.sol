@@ -24,6 +24,7 @@ contract USDYTest is Test {
     event Paused(address account);
     event Unpaused(address account);
     event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 
     function setUp() public {
         admin = address(1);
@@ -368,8 +369,18 @@ contract USDYTest is Test {
         // Transfer should emit event with actual value for transparency
         vm.prank(user1);
         vm.expectEmit(true, true, false, true);
-        emit Transfer(user1, address(user2), transferAmount);
+        emit Transfer(user1, user2, transferAmount);
         token.transfer(saddress(user2), suint256(transferAmount));
+    }
+
+    function test_ApprovalPrivacy() public {
+        uint256 approvalAmount = 100e18;
+        
+        // Approve should emit event with actual value for transparency
+        vm.prank(user1);
+        vm.expectEmit(true, true, false, true);
+        emit Approval(user1, user2, approvalAmount);
+        token.approve(saddress(user2), suint256(approvalAmount));
     }
 
     // Combined Functionality Tests

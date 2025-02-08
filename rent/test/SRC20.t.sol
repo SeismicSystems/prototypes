@@ -38,13 +38,16 @@ contract TestSRC20Decimals is SRC20 {
 }
 
 contract TestSRC20WithEvents is TestSRC20 {
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
     constructor(string memory name, string memory symbol) TestSRC20(name, symbol) {}
 
-    function _emitTransferEvent(address from, address to, uint256 value) internal override {
+    function emitTransfer(address from, address to, uint256 value) public virtual override {
         emit Transfer(from, to, value);
     }
 
-    function _emitApprovalEvent(address owner, address spender, uint256 value) internal override {
+    function emitApproval(address owner, address spender, uint256 value) public virtual override {
         emit Approval(owner, spender, value);
     }
 }

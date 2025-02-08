@@ -61,9 +61,8 @@ contract USDYApproveTest is Test {
     }
 
     function test_ApproveEmitsEvent() public {
-        uint256 amount = 1 * 1e18;
-
-        // Approve should emit Approval event
+        uint256 amount = 100e18;
+        
         vm.prank(owner);
         vm.expectEmit(true, true, false, true);
         emit Approval(owner, spender, amount);
@@ -436,9 +435,8 @@ contract USDYApproveTest is Test {
     }
 
     function test_IncreaseAllowanceEmitsEvent() public {
-        uint256 amount = 100 * 1e18;
-
-        // Increase allowance should emit Approval event
+        uint256 amount = 100e18;
+        
         vm.prank(owner);
         vm.expectEmit(true, true, false, true);
         emit Approval(owner, spender, amount);
@@ -588,14 +586,12 @@ contract USDYApproveTest is Test {
     }
 
     function test_DecreaseAllowanceEmitsEvent() public {
-        uint256 initialAmount = 2 * 1e18;
-        uint256 decreaseAmount = 1 * 1e18;
-
-        // Set initial allowance
+        uint256 initialAmount = 100e18;
+        uint256 decreaseAmount = 50e18;
+        
         vm.prank(owner);
         token.approve(saddress(spender), suint256(initialAmount));
-
-        // Decrease allowance should emit Approval event
+        
         vm.prank(owner);
         vm.expectEmit(true, true, false, true);
         emit Approval(owner, spender, initialAmount - decreaseAmount);

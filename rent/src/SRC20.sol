@@ -2,21 +2,21 @@
 
 pragma solidity ^0.8.20;
 
-import {SIRC20} from "./SIRC20.sol";
-import {SIRC20Metadata} from "./SIRC20Metadata.sol";
+import {ISRC20} from "./ISRC20.sol";
+import {ISRC20Metadata} from "./ISRC20Metadata.sol";
 import {Context} from "../lib/openzeppelin-contracts/contracts/utils/Context.sol";
 import {IERC20Errors} from "../lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
 
 error UnauthorizedView();
 
 /**
- * @dev Implementation of the {SIRC20} interface with privacy protections using shielded types.
+ * @dev Implementation of the {ISRC20} interface with privacy protections using shielded types.
  * Public view functions that would leak privacy are implemented as no-ops while maintaining interface compatibility.
  * Total supply remains public while individual balances and transfers are private.
  * Currently, this implementation is fully compliant with the ERC-20 standard, meaning that transfer recipients are NOT shielded/private.
  * Recipient addresses appear in the Transfer event as unshielded addresses.
  */
-abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
+abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
     mapping(saddress account => suint256) private _balances;
     mapping(saddress account => mapping(saddress spender => suint256)) private _allowances;
 
@@ -62,21 +62,21 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
      *
      * NOTE: This information is only used for _display_ purposes: it in
      * no way affects any of the arithmetic of the contract, including
-     * {SIRC20-balanceOf} and {SIRC20-transfer}.
+     * {ISRC20-balanceOf} and {ISRC20-transfer}.
      */
     function decimals() public view virtual override returns (uint8) {
         return 18;
     }
 
     /**
-     * @dev See {SIRC20-totalSupply}.
+     * @dev See {ISRC20-totalSupply}.
      */
     function totalSupply() public view virtual returns (uint256) {
         return _totalSupply;
     }
 
     /**
-     * @dev See {SIRC20-balanceOf}.
+     * @dev See {ISRC20-balanceOf}.
      * Reverts if caller is not the account owner to maintain privacy.
      */
     function balanceOf(saddress account) public view virtual override returns (uint256) {
@@ -114,7 +114,7 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
     }
 
     /**
-     * @dev See {SIRC20-allowance}.
+     * @dev See {ISRC20-allowance}.
      * Reverts if caller is neither the owner nor the spender to maintain privacy.
      */
     function allowance(saddress owner, saddress spender) public virtual view returns (uint256) {
@@ -188,7 +188,7 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
      * @dev Atomically increases the allowance granted to a shielded `spender` by a shielded `addedValue`.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {SIRC20-approve}.
+     * problems described in {ISRC20-approve}.
      *
      * The operation is atomic - it directly accesses and modifies the underlying
      * shielded allowance mapping to prevent race conditions.
@@ -211,7 +211,7 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
      * @dev Atomically decreases the allowance granted to a shielded `spender` by a shielded `subtractedValue`.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {SIRC20-approve}.
+     * problems described in {ISRC20-approve}.
      *
      * The operation is atomic - it directly accesses and modifies the underlying
      * shielded allowance mapping to prevent race conditions.
@@ -290,7 +290,7 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
             }
         }
 
-        _emitTransferEvent(address(from), address(to), 0); // Replace emit Transfer
+        emitTransfer(address(from), address(to), 0); // Replace _emitTransferEvent
 
         _afterTokenTransfer(from, to, value);
     }
@@ -371,7 +371,7 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
         }
         _allowances[owner][spender] = value;
         if (emitEvent) {
-            _emitApprovalEvent(address(owner), address(spender), 0);
+            emitApproval(address(owner), address(spender), 0);
         }
     }
 
@@ -432,18 +432,18 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
     function _afterTokenTransfer(saddress from, saddress to, suint256 value) internal virtual {}
 
     /**
-     * @dev Virtual function to emit Transfer event. No-op by default for privacy.
+     * @dev Implementation of emitTransfer. No-op by default for privacy.
      * Can be overridden to implement custom event emission behavior.
      */
-    function _emitTransferEvent(address from, address to, uint256 value) internal virtual {
+    function emitTransfer(address from, address to, uint256 value) public virtual override {
         // No-op by default
     }
 
     /**
-     * @dev Virtual function to emit Approval event. No-op by default for privacy.
+     * @dev Implementation of emitApproval. No-op by default for privacy.
      * Can be overridden to implement custom event emission behavior.
      */
-    function _emitApprovalEvent(address owner, address spender, uint256 value) internal virtual {
+    function emitApproval(address owner, address spender, uint256 value) public virtual override {
         // No-op by default
     }
 }

@@ -5,20 +5,28 @@ pragma solidity ^0.8.20;
 /**
  * @dev Interface of the ERC-20 standard as defined in the ERC, modified for shielded types.
  */
-interface SIRC20 {
+interface ISRC20 {
     /**
-     * @dev Emitted when `value` tokens are moved from one account (`from`) to
-     * another (`to`).
-     *
-     * Note that `value` may be zero.
+     * @dev Function to emit when tokens are moved from one account to another.
+     * Must be overridden by implementing contracts to define event emission behavior.
+     * Default implementation is no-op for privacy.
+     * 
+     * @param from The sender address
+     * @param to The recipient address
+     * @param value The transfer amount
      */
-    event Transfer(address indexed from, address indexed to, uint256 value);
+    function emitTransfer(address from, address to, uint256 value) external;
 
     /**
-     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
-     * a call to {approve}. `value` is the new allowance.
+     * @dev Function to emit when allowance is modified.
+     * Must be overridden by implementing contracts to define event emission behavior.
+     * Default implementation is no-op for privacy.
+     * 
+     * @param owner The token owner
+     * @param spender The approved spender
+     * @param value The approved amount
      */
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    function emitApproval(address owner, address spender, uint256 value) external;
 
     /**
      * @dev Returns the value of tokens in existence.

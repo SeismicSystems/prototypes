@@ -11,7 +11,7 @@
 ## Architecture
 
 - `SRC20.sol`: Base privacy-preserving ERC20 implementation using shielded types
-- `SIRC20.sol`: Interface for shielded ERC20 functionality
+- `ISRC20.sol`: Interface for shielded ERC20 functionality
 - `USDY.sol`: Yield-bearing USD stablecoin with privacy features
 - Comprehensive test suite in `test/` directory
 - Deployment scripts in `script/` directory

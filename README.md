@@ -19,7 +19,7 @@ Below is a quick summary of each prototype currently available in this repositor
    Contracts for a rent platform where tenants can pay their rent with a yield-bearing stablecoin.
 
    - SRC20 Token Standard
-   - SIRC20 interface
+   - ISRC20 interface
    - USDY, a yield-bearing stablecoin built on SRC20
 
 2. **`Project 2 here`**  
