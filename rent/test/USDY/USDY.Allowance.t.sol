@@ -90,9 +90,10 @@ contract USDYAllowanceTest is Test {
         vm.prank(spender);
         assertEq(token.allowance(saddress(owner), saddress(spender)), allowanceAmount);
 
-        // Others see zero
+        // Others cannot see allowance (reverts with UnauthorizedView)
         vm.prank(recipient);
-        assertEq(token.allowance(saddress(owner), saddress(spender)), 0);
+        vm.expectRevert(USDY.UnauthorizedView.selector);
+        token.allowance(saddress(owner), saddress(spender));
     }
 
     function test_InfiniteAllowanceWithYield() public {

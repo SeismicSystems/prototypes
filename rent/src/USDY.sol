@@ -20,9 +20,6 @@ contract USDY is SRC20 {
     mapping(saddress => suint256) private _shares;
     suint256 private _totalShares;
 
-    // Allowances mapping for each token owner => spender => amount
-    mapping(saddress => mapping(saddress => suint256)) private _allowances;
-
     // Access control roles
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
@@ -50,6 +47,7 @@ contract USDY is SRC20 {
     error ZeroRewardIncrement();
     error MissingRole(bytes32 role, address account);
     error TransferWhilePaused();
+    error UnauthorizedView();
 
     /**
      * @notice Constructs the USDY contract
@@ -262,7 +260,7 @@ contract USDY is SRC20 {
     }
 
     /**
-     * @dev Override _update to handle shielded shares accounting
+     * @dev Override _update to account for shielded shares rather than raw token balances
      * @param from The sender address
      * @param to The recipient address  
      * @param value The amount of tokens to transfer
@@ -320,7 +318,7 @@ contract USDY is SRC20 {
 
     /**
      * @notice Transfers a specified number of tokens from the caller's address to the recipient.
-     * @dev Uses _update for share-based accounting while maintaining token-based interface
+     * @dev Uses new _update for share-based accounting while maintaining token-based amount parameter
      * @param to The shielded address to which tokens will be transferred.
      * @param amount The shielded number of tokens to transfer.
      * @return A boolean value indicating whether the operation succeeded.
@@ -335,7 +333,7 @@ contract USDY is SRC20 {
 
     /**
      * @notice Transfers tokens from one address to another using the allowance mechanism
-     * @dev Uses _update for share-based accounting while maintaining token-based interface
+     * @dev Uses new _update for share-based accounting while maintaining token-based amount parameter
      * @param from The shielded address to transfer from
      * @param to The shielded address to transfer to
      * @param amount The shielded amount to transfer
@@ -351,97 +349,76 @@ contract USDY is SRC20 {
             revert ERC20InvalidReceiver(address(0));
         }
 
-        suint256 currentAllowance = _allowances[from][saddress(spender)];
-        if (currentAllowance != type(suint256).max) {
-            if (currentAllowance < amount) {
-                revert ERC20InsufficientAllowance(spender, uint256(currentAllowance), uint256(amount));
-            }
-            unchecked {
-                _allowances[from][saddress(spender)] = currentAllowance - amount;
-            }
+        uint256 currentAllowance = allowance(from, saddress(spender));
+        if (currentAllowance < uint256(amount)) {
+            revert ERC20InsufficientAllowance(spender, currentAllowance, uint256(amount));
         }
 
+        _spendAllowance(from, saddress(spender), amount);
         _update(from, to, amount);
         return true;
     }
 
     /**
-     * @notice This is the exact same implementation as the one in SRC20.sol
      * @dev See {ISRC20-allowance}.
-     * Returns actual allowance if caller is either the owner or the spender,
-     * returns 0 otherwise to maintain privacy.
+     * @notice Returns the amount of tokens the spender is allowed to spend on behalf of the owner.
+     * @dev Reverts with UnauthorizedView if the caller is neither the owner nor the spender.
      */
     function allowance(saddress owner, saddress spender) public view override returns (uint256) {
-        saddress caller = saddress(_msgSender());
-        if (caller == owner || caller == spender) {
-            return uint256(_allowances[saddress(owner)][saddress(spender)]);
+        if (owner != saddress(_msgSender()) && spender != saddress(_msgSender())) {
+            revert UnauthorizedView();
         }
-        return 0;
+        return super.allowance(owner, spender);
     }
 
     /**
      * @notice Sets `amount` as the allowance of `spender` over the caller's tokens
+     * @dev Adds pausable functionality on top of SRC20's approve
      * @param spender The address which will spend the funds
      * @param amount The amount of tokens to be spent
      * @return A boolean value indicating whether the operation succeeded
      */
     function approve(saddress spender, suint256 amount) public override whenNotPaused returns (bool) {
         address owner = _msgSender();
-        if (spender == saddress(address(0))) {
-            revert ERC20InvalidSpender(address(0));
-        }
-        if (saddress(owner) == saddress(address(0))) {
-            revert ERC20InvalidSpender(address(0));
-        }
-
-        _allowances[saddress(owner)][spender] = amount;
-        emitApproval(owner, address(spender), uint256(amount));
-
-        return true;
+        if (owner == address(0)) revert ERC20InvalidSpender(address(0));
+        emit Approval(owner, address(spender), uint256(amount));
+        return super.approve(spender, amount);
     }
 
     /**
      * @notice Atomically increases the allowance granted to `spender` by the caller
+     * @dev Adds pausable functionality on top of SRC20's increaseAllowance
      * @param spender The address which will spend the funds
      * @param addedValue The amount of tokens to increase the allowance by
      * @return A boolean value indicating whether the operation succeeded
      */
     function increaseAllowance(saddress spender, suint256 addedValue) public virtual override whenNotPaused returns (bool) {
         address owner = _msgSender();
-        if (spender == saddress(address(0))) {
-            revert ERC20InvalidSpender(address(0));
-        }
-
-        unchecked {
-            _allowances[saddress(owner)][spender] += addedValue;
-        }
-        emitApproval(owner, address(spender), uint256(_allowances[saddress(owner)][spender]));
-
-        return true;
+        uint256 currentAllowance = allowance(saddress(owner), spender);
+        suint256 newAllowance = suint256(currentAllowance) + addedValue;
+        emit Approval(owner, address(spender), uint256(newAllowance));
+        return super.increaseAllowance(spender, addedValue);
     }
 
     /**
      * @notice Atomically decreases the allowance granted to `spender` by the caller
+     * @dev Adds pausable functionality on top of SRC20's decreaseAllowance
      * @param spender The address which will spend the funds
      * @param subtractedValue The amount of tokens to decrease the allowance by
      * @return A boolean value indicating whether the operation succeeded
      */
     function decreaseAllowance(saddress spender, suint256 subtractedValue) public virtual override whenNotPaused returns (bool) {
         address owner = _msgSender();
-        if (spender == saddress(address(0))) {
-            revert ERC20InvalidSpender(address(0));
-        }
-
-        suint256 currentAllowance = _allowances[saddress(owner)][spender];
-        if (currentAllowance < subtractedValue) {
-            revert ERC20InsufficientAllowance(address(spender), uint256(currentAllowance), uint256(subtractedValue));
+        uint256 currentAllowance = allowance(saddress(owner), spender);
+        uint256 subtractedAmount = uint256(subtractedValue);
+        if (currentAllowance < subtractedAmount) {
+            revert ERC20InsufficientAllowance(address(spender), currentAllowance, subtractedAmount);
         }
         unchecked {
-            _allowances[saddress(owner)][spender] = currentAllowance - subtractedValue;
+            uint256 newAllowance = currentAllowance - subtractedAmount;
+            emit Approval(owner, address(spender), newAllowance);
+            return super.decreaseAllowance(spender, subtractedValue);
         }
-        emitApproval(owner, address(spender), uint256(_allowances[saddress(owner)][spender]));
-
-        return true;
     }
 
     // Override the event emission functions to emit actual events

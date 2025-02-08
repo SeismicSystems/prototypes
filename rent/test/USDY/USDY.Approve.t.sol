@@ -118,7 +118,8 @@ contract USDYApproveTest is Test {
 
         // Other accounts cannot see allowance
         vm.prank(observer);
-        assertEq(token.allowance(saddress(owner), saddress(spender)), 0);
+        vm.expectRevert(USDY.UnauthorizedView.selector);
+        token.allowance(saddress(owner), saddress(spender));
     }
 
     function test_ApproveZeroAmount() public {
@@ -383,23 +384,29 @@ contract USDYApproveTest is Test {
     }
 
     function test_TransferFromZeroAmount() public {
-        // Set allowance
+        // Set small allowance
         vm.prank(owner);
         token.approve(saddress(spender), suint256(1));
 
-        // Record initial state
+        // Check initial balance
         vm.prank(owner);
-        uint256 initialOwnerBalance = token.balanceOf(saddress(owner));
-        uint256 initialAllowance = token.allowance(saddress(owner), saddress(spender));
+        uint256 initialBalance = token.balanceOf(saddress(owner));
+
+        // Check allowance (from owner's view)
+        vm.prank(owner);
+        assertEq(token.allowance(saddress(owner), saddress(spender)), 1);
 
         // Transfer zero amount
         vm.prank(spender);
         token.transferFrom(saddress(owner), saddress(recipient), suint256(0));
 
-        // Verify state remains unchanged
+        // Check balance unchanged
         vm.prank(owner);
-        assertEq(token.balanceOf(saddress(owner)), initialOwnerBalance);
-        assertEq(token.allowance(saddress(owner), saddress(spender)), initialAllowance);
+        assertEq(token.balanceOf(saddress(owner)), initialBalance);
+
+        // Check allowance unchanged (from owner's view)
+        vm.prank(owner);
+        assertEq(token.allowance(saddress(owner), saddress(spender)), 1);
     }
 
     function test_IncreaseAllowanceAmount() public {
@@ -453,28 +460,29 @@ contract USDYApproveTest is Test {
     }
 
     function test_IncreaseAllowancePrivacy() public {
-        uint256 amount = 100 * 1e18;
+        uint256 initialAmount = 100 * 1e18;
+        uint256 increaseAmount = 100 * 1e18;
 
-        // Set initial allowance
+        // Set initial approval
         vm.prank(owner);
-        token.approve(saddress(spender), suint256(amount));
+        token.approve(saddress(spender), suint256(initialAmount));
 
         // Increase allowance
         vm.prank(owner);
-        token.increaseAllowance(saddress(spender), suint256(amount));
+        token.increaseAllowance(saddress(spender), suint256(increaseAmount));
 
         // Owner can see allowance
         vm.prank(owner);
-        assertEq(token.allowance(saddress(owner), saddress(spender)), amount * 2);
+        assertEq(token.allowance(saddress(owner), saddress(spender)), initialAmount + increaseAmount);
 
         // Spender can see allowance
         vm.prank(spender);
-        assertEq(token.allowance(saddress(owner), saddress(spender)), amount * 2);
+        assertEq(token.allowance(saddress(owner), saddress(spender)), initialAmount + increaseAmount);
 
         // Other accounts cannot see allowance
-        address otherUser = address(99);
-        vm.prank(otherUser);
-        assertEq(token.allowance(saddress(owner), saddress(spender)), 0);
+        vm.prank(observer);
+        vm.expectRevert(USDY.UnauthorizedView.selector);
+        token.allowance(saddress(owner), saddress(spender));
     }
 
     function test_IncreaseAllowanceWithZeroValue() public {
@@ -602,7 +610,7 @@ contract USDYApproveTest is Test {
         uint256 initialAmount = 100 * 1e18;
         uint256 decreaseAmount = 40 * 1e18;
 
-        // Set initial allowance
+        // Set initial approval
         vm.prank(owner);
         token.approve(saddress(spender), suint256(initialAmount));
 
@@ -610,17 +618,18 @@ contract USDYApproveTest is Test {
         vm.prank(owner);
         token.decreaseAllowance(saddress(spender), suint256(decreaseAmount));
 
-        // Owner can see decreased allowance
+        // Owner can see allowance
         vm.prank(owner);
         assertEq(token.allowance(saddress(owner), saddress(spender)), initialAmount - decreaseAmount);
 
-        // Spender can see decreased allowance
+        // Spender can see allowance
         vm.prank(spender);
         assertEq(token.allowance(saddress(owner), saddress(spender)), initialAmount - decreaseAmount);
 
         // Other accounts cannot see allowance
         vm.prank(observer);
-        assertEq(token.allowance(saddress(owner), saddress(spender)), 0);
+        vm.expectRevert(USDY.UnauthorizedView.selector);
+        token.allowance(saddress(owner), saddress(spender));
     }
 
     function test_DecreaseAllowanceWithZeroValue() public {

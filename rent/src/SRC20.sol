@@ -13,8 +13,6 @@ error UnauthorizedView();
  * @dev Implementation of the {ISRC20} interface with privacy protections using shielded types.
  * Public view functions that would leak privacy are implemented as no-ops while maintaining interface compatibility.
  * Total supply remains public while individual balances and transfers are private.
- * Currently, this implementation is fully compliant with the ERC-20 standard, meaning that transfer recipients are NOT shielded/private.
- * Recipient addresses appear in the Transfer event as unshielded addresses.
  */
 abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
     mapping(saddress account => suint256) private _balances;
@@ -261,7 +259,7 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
      * (or `to`) is the zero address. All customizations to transfers, mints, and burns should be done by overriding
      * this function.
      *
-     * Emits a {Transfer} event.
+     * Calls `emitTransferEvent`.
      */
     function _update(saddress from, saddress to, suint256 value) internal virtual {
         _beforeTokenTransfer(from, to, value);
@@ -272,7 +270,7 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
         } else {
             suint256 fromBalance = _balances[from];
             if (fromBalance < value) {
-                revert ERC20InsufficientBalance(address(from), uint256(0), uint256(0)); // Zero values to protect privacy
+                revert ERC20InsufficientBalance(address(from), uint256(0), uint256(0));
             }
             unchecked {
                 _balances[from] = fromBalance - value;
@@ -290,7 +288,7 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
             }
         }
 
-        emitTransfer(address(from), address(to), 0); // Replace _emitTransferEvent
+        emitTransfer(address(from), address(to), 0);
 
         _afterTokenTransfer(from, to, value);
     }
