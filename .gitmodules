@@ -1,6 +1,3 @@
-[submodule "walnut/lib/forge-std"]
-	path = walnut/lib/forge-std
-	url = https://github.com/foundry-rs/forge-std
 [submodule "rent/lib/forge-std"]
 	path = rent/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std

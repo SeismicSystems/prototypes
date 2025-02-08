@@ -7,6 +7,8 @@ import {SIRC20Metadata} from "./SIRC20Metadata.sol";
 import {Context} from "../lib/openzeppelin-contracts/contracts/utils/Context.sol";
 import {IERC20Errors} from "../lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
 
+error UnauthorizedView();
+
 /**
  * @dev Implementation of the {SIRC20} interface with privacy protections using shielded types.
  * Public view functions that would leak privacy are implemented as no-ops while maintaining interface compatibility.
@@ -75,14 +77,24 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
 
     /**
      * @dev See {SIRC20-balanceOf}.
-     * Returns the balance of the caller if `account` matches the caller's address,
-     * returns 0 otherwise to maintain privacy.
+     * Reverts if caller is not the account owner to maintain privacy.
      */
     function balanceOf(saddress account) public view virtual override returns (uint256) {
         if (account == saddress(_msgSender())) {
             return uint256(_balances[account]);
         }
-        return 0;
+        revert UnauthorizedView();
+    }
+
+    /**
+     * @dev Safe version of balanceOf that returns success boolean along with balance.
+     * Returns (true, balance) if caller is the account owner, (false, 0) otherwise.
+     */
+    function safeBalanceOf(saddress account) public view returns (bool, uint256) {
+        if (account == saddress(_msgSender())) {
+            return (true, uint256(_balances[account]));
+        }
+        return (false, 0);
     }
 
     /**
@@ -103,15 +115,26 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
 
     /**
      * @dev See {SIRC20-allowance}.
-     * Returns actual allowance if caller is either the owner or the spender,
-     * returns 0 otherwise to maintain privacy.
+     * Reverts if caller is neither the owner nor the spender to maintain privacy.
      */
     function allowance(saddress owner, saddress spender) public virtual view returns (uint256) {
         saddress caller = saddress(_msgSender());
         if (caller == owner || caller == spender) {
             return uint256(_allowances[saddress(owner)][saddress(spender)]);
         }
-        return 0;
+        revert UnauthorizedView();
+    }
+
+    /**
+     * @dev Safe version of allowance that returns success boolean along with allowance.
+     * Returns (true, allowance) if caller is owner or spender, (false, 0) otherwise.
+     */
+    function safeAllowance(saddress owner, saddress spender) public view returns (bool, uint256) {
+        saddress caller = saddress(_msgSender());
+        if (caller == owner || caller == spender) {
+            return (true, uint256(_allowances[saddress(owner)][saddress(spender)]));
+        }
+        return (false, 0);
     }
 
     /**
@@ -267,7 +290,7 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
             }
         }
 
-        emit Transfer(address(from), address(0), uint256(0)); // Zero value to protect privacy
+        _emitTransferEvent(address(from), address(to), 0); // Replace emit Transfer
 
         _afterTokenTransfer(from, to, value);
     }
@@ -348,7 +371,7 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
         }
         _allowances[owner][spender] = value;
         if (emitEvent) {
-            // emit Approval(address(owner), address(spender), uint256(0)); // Zero value to protect privacy
+            _emitApprovalEvent(address(owner), address(spender), 0);
         }
     }
 
@@ -407,4 +430,20 @@ abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
     function _afterTokenTransfer(saddress from, saddress to, suint256 value) internal virtual {}
+
+    /**
+     * @dev Virtual function to emit Transfer event. No-op by default for privacy.
+     * Can be overridden to implement custom event emission behavior.
+     */
+    function _emitTransferEvent(address from, address to, uint256 value) internal virtual {
+        // No-op by default
+    }
+
+    /**
+     * @dev Virtual function to emit Approval event. No-op by default for privacy.
+     * Can be overridden to implement custom event emission behavior.
+     */
+    function _emitApprovalEvent(address owner, address spender, uint256 value) internal virtual {
+        // No-op by default
+    }
 }
