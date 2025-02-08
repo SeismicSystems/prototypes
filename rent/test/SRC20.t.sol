@@ -303,9 +303,14 @@ contract SRC20Test is Test {
 
     // Approve Edge Cases Tests
 
-    function test_ApproveEmitsEvent() public {
+    function test_ApproveEmitsNoEvent() public {
+        // No event expectation since emitApproval is a no-op by default
         vm.prank(initialHolder);
         token.approve(saddress(recipient), suint256(50 * 10**18));
+        
+        // Verify the approval was still set
+        vm.prank(initialHolder);
+        assertEq(token.allowance(saddress(initialHolder), saddress(recipient)), 50 * 10**18);
     }
 
     function test_ApproveFromZeroAddress() public {
@@ -365,12 +370,17 @@ contract SRC20Test is Test {
         token.transferFrom(saddress(initialHolder), saddress(anotherAccount), suint256(largeAmount));
     }
 
-    function test_ApproveTwiceEmitsEvents() public {
+    function test_ApproveTwiceNoEvents() public {
+        // No event expectations since emitApproval is a no-op by default
         vm.prank(initialHolder);
         token.approve(saddress(recipient), suint256(100));
 
         vm.prank(initialHolder);
         token.approve(saddress(recipient), suint256(200));
+        
+        // Verify the final approval was set
+        vm.prank(initialHolder);
+        assertEq(token.allowance(saddress(initialHolder), saddress(recipient)), 200);
     }
 }
 

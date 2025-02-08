@@ -329,38 +329,14 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
      * This internal function is equivalent to `approve`, and can be used to
      * e.g. set automatic allowances for certain subsystems, etc.
      *
-     * Emits an {Approval} event.
+     * Calls emitApproval which is a no-op by default for privacy.
      *
      * Requirements:
      *
      * - `owner` cannot be the zero address.
      * - `spender` cannot be the zero address.
-     *
-     * Overrides to this logic should be done to the variant with an additional `bool emitEvent` argument.
      */
-    function _approve(saddress owner, saddress spender, suint256 value) internal {
-        _approve(owner, spender, value, sbool(true));
-    }
-
-    /**
-     * @dev Variant of {_approve} with an optional flag to enable or disable the {Approval} event.
-     *
-     * By default (when calling {_approve}) the flag is set to true. On the other hand, approval changes made by
-     * `_spendAllowance` during the `transferFrom` operation set the flag to false. This saves gas by not emitting any
-     * `Approval` event during `transferFrom` operations.
-     *
-     * Anyone who wishes to continue emitting `Approval` events on the`transferFrom` operation can force the flag to
-     * true using the following override:
-     *
-     * ```solidity
-     * function _approve(address owner, address spender, uint256 value, bool) internal virtual override {
-     *     super._approve(owner, spender, value, true);
-     * }
-     * ```
-     *
-     * Requirements are the same as {_approve}.
-     */
-    function _approve(saddress owner, saddress spender, suint256 value, sbool emitEvent) internal virtual {
+    function _approve(saddress owner, saddress spender, suint256 value) internal virtual {
         if (owner == saddress(address(0))) {
             revert ERC20InvalidApprover(address(0));
         }
@@ -368,9 +344,7 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
             revert ERC20InvalidSpender(address(0));
         }
         _allowances[owner][spender] = value;
-        if (emitEvent) {
-            emitApproval(address(owner), address(spender), 0);
-        }
+        emitApproval(address(owner), address(spender), uint256(value));
     }
 
     /**
@@ -388,7 +362,7 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
                 revert ERC20InsufficientAllowance(address(spender), uint256(0), uint256(0)); // Zero values to protect privacy
             }
             unchecked {
-                _approve(owner, spender, currentAllowance - value, sbool(false));
+                _approve(owner, spender, currentAllowance - value);
             }
         }
     }
