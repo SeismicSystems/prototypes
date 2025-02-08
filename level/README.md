@@ -12,7 +12,7 @@ DePIN projects that rely on token incentives to bootstrap service operators are 
 
 ### Insight
 
-We can lighten the burden of token volatility on operators by always guaranteeing a minimum withdrawal value and a baseline price for the token. Network quality will be more stable and able to grow faster.
+We can lighten the burden of token volatility on operators by making the price not viewable, while still guaranteeing a minimum withdrawal value. Network quality will be more stable and able to grow faster.
 
 ### Solution
 
