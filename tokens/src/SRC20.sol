@@ -2,19 +2,19 @@
 
 pragma solidity ^0.8.20;
 
-import {SIERC20} from "./SIERC20.sol";
-import {SIERC20Metadata} from "./SIERC20Metadata.sol";
+import {SIRC20} from "./SIRC20.sol";
+import {SIRC20Metadata} from "./SIRC20Metadata.sol";
 import {Context} from "../openzeppelin/utils/Context.sol";
 import {IERC20Errors} from "../openzeppelin/interfaces/draft-IERC6093.sol";
 
 /**
- * @dev Implementation of the {SIERC20} interface with privacy protections using shielded types.
+ * @dev Implementation of the {SIRC20} interface with privacy protections using shielded types.
  * Public view functions that would leak privacy are implemented as no-ops while maintaining interface compatibility.
  * Total supply remains public while individual balances and transfers are private.
  * Currently, this implementation is fully compliant with the ERC-20 standard, meaning that transfer recipients are NOT shielded/private.
  * Recipient addresses appear in the Transfer event as unshielded addresses.
  */
-abstract contract SERC20 is Context, SIERC20, SIERC20Metadata, IERC20Errors {
+abstract contract SRC20 is Context, SIRC20, SIRC20Metadata, IERC20Errors {
     mapping(saddress account => suint256) private _balances;
     mapping(saddress account => mapping(saddress spender => suint256)) private _allowances;
 
@@ -60,21 +60,21 @@ abstract contract SERC20 is Context, SIERC20, SIERC20Metadata, IERC20Errors {
      *
      * NOTE: This information is only used for _display_ purposes: it in
      * no way affects any of the arithmetic of the contract, including
-     * {SIERC20-balanceOf} and {SIERC20-transfer}.
+     * {SIRC20-balanceOf} and {SIRC20-transfer}.
      */
     function decimals() public view virtual override returns (uint8) {
         return 18;
     }
 
     /**
-     * @dev See {SIERC20-totalSupply}.
+     * @dev See {SIRC20-totalSupply}.
      */
     function totalSupply() public view virtual returns (uint256) {
         return _totalSupply;
     }
 
     /**
-     * @dev See {SIERC20-balanceOf}.
+     * @dev See {SIRC20-balanceOf}.
      * Returns the balance of the caller if `account` matches the caller's address,
      * returns 0 otherwise to maintain privacy.
      */
@@ -102,7 +102,7 @@ abstract contract SERC20 is Context, SIERC20, SIERC20Metadata, IERC20Errors {
     }
 
     /**
-     * @dev See {SIERC20-allowance}.
+     * @dev See {SIRC20-allowance}.
      * Returns actual allowance if caller is either the owner or the spender,
      * returns 0 otherwise to maintain privacy.
      */
@@ -160,7 +160,7 @@ abstract contract SERC20 is Context, SIERC20, SIERC20Metadata, IERC20Errors {
      * @dev Atomically increases the allowance granted to a shielded `spender` by a shielded `addedValue`.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {SIERC20-approve}.
+     * problems described in {SIRC20-approve}.
      *
      * The operation is atomic - it directly accesses and modifies the underlying
      * shielded allowance mapping to prevent race conditions.
@@ -183,7 +183,7 @@ abstract contract SERC20 is Context, SIERC20, SIERC20Metadata, IERC20Errors {
      * @dev Atomically decreases the allowance granted to a shielded `spender` by a shielded `subtractedValue`.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {SIERC20-approve}.
+     * problems described in {SIRC20-approve}.
      *
      * The operation is atomic - it directly accesses and modifies the underlying
      * shielded allowance mapping to prevent race conditions.

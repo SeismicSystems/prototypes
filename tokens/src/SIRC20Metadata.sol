@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.20;
 
-import {SIERC20} from "./SIERC20.sol";
+import {SIRC20} from "./SIRC20.sol";
 
 /**
  * @dev Interface for the optional metadata functions from the ERC-20 standard.
  */
-interface SIERC20Metadata is SIERC20 {
+interface SIRC20Metadata is SIRC20 {
     /**
      * @dev Returns the name of the token.
      */

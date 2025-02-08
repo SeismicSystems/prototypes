@@ -2,11 +2,11 @@
 pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
-import {SERC20} from "../src/SERC20.sol";
+import {SRC20} from "../src/SRC20.sol";
 import {IERC20Errors} from "../openzeppelin/interfaces/draft-IERC6093.sol";
 
-contract TestSERC20 is SERC20 {
-    constructor(string memory name, string memory symbol) SERC20(name, symbol) {}
+contract TestSRC20 is SRC20 {
+    constructor(string memory name, string memory symbol) SRC20(name, symbol) {}
 
     function mint(saddress account, suint256 value) public {
         _mint(account, value);
@@ -17,10 +17,10 @@ contract TestSERC20 is SERC20 {
     }
 }
 
-contract TestSERC20Decimals is SERC20 {
+contract TestSRC20Decimals is SRC20 {
     uint8 private immutable _decimals;
 
-    constructor(string memory name, string memory symbol, uint8 decimals_) SERC20(name, symbol) {
+    constructor(string memory name, string memory symbol, uint8 decimals_) SRC20(name, symbol) {
         _decimals = decimals_;
     }
 
@@ -37,8 +37,8 @@ contract TestSERC20Decimals is SERC20 {
     }
 }
 
-contract SERC20Test is Test {
-    TestSERC20 public token;
+contract SRC20Test is Test {
+    TestSRC20 public token;
     address public initialHolder;
     address public recipient;
     address public anotherAccount;
@@ -53,7 +53,7 @@ contract SERC20Test is Test {
         anotherAccount = address(3);
         initialSupply = 100 * 10**18; // 100 tokens with 18 decimals
 
-        token = new TestSERC20("My Token", "MTKN");
+        token = new TestSRC20("My Token", "MTKN");
         token.mint(saddress(initialHolder), suint256(initialSupply));
     }
 
@@ -382,9 +382,9 @@ contract SERC20Test is Test {
 
 }
 
-contract SERC20DecimalsTest is Test {
-    TestSERC20Decimals public token6;
-    TestSERC20Decimals public token0;
+contract SRC20DecimalsTest is Test {
+    TestSRC20Decimals public token6;
+    TestSRC20Decimals public token0;
     address public holder;
     address public recipient;
 
@@ -395,8 +395,8 @@ contract SERC20DecimalsTest is Test {
         recipient = address(2);
 
         // Create tokens with different decimal configurations
-        token6 = new TestSERC20Decimals("Six Decimals", "SIX", 6);
-        token0 = new TestSERC20Decimals("Zero Decimals", "ZERO", 0);
+        token6 = new TestSRC20Decimals("Six Decimals", "SIX", 6);
+        token0 = new TestSRC20Decimals("Zero Decimals", "ZERO", 0);
     }
 
     function test_CustomDecimals() public view {
@@ -507,8 +507,8 @@ contract SERC20DecimalsTest is Test {
     }
 }
 
-contract SERC20AllowanceTest is Test {
-    TestSERC20 public token;
+contract SRC20AllowanceTest is Test {
+    TestSRC20 public token;
     address public initialHolder;
     address public spender;
     address public otherAccount;
@@ -522,7 +522,7 @@ contract SERC20AllowanceTest is Test {
         otherAccount = address(3);
         initialSupply = 100 * 10**18;
 
-        token = new TestSERC20("My Token", "MTKN");
+        token = new TestSRC20("My Token", "MTKN");
         token.mint(saddress(initialHolder), suint256(initialSupply));
     }
 
@@ -788,14 +788,14 @@ contract SERC20AllowanceTest is Test {
     }
 }
 
-contract SERC20MetadataTest is Test {
-    TestSERC20 public token;
+contract SRC20MetadataTest is Test {
+    TestSRC20 public token;
     string constant NAME = "Test Token";
     string constant SYMBOL = "TST";
     uint8 constant DECIMALS = 18;
 
     function setUp() public {
-        token = new TestSERC20(NAME, SYMBOL);
+        token = new TestSRC20(NAME, SYMBOL);
     }
 
     function test_TokenName() public view {
@@ -811,14 +811,14 @@ contract SERC20MetadataTest is Test {
     }
 }
 
-contract SERC20MintBurnTest is Test {
-    TestSERC20 public token;
+contract SRC20MintBurnTest is Test {
+    TestSRC20 public token;
     address public initialHolder = address(1);
     address public recipient = address(2);
     uint256 public initialSupply = 100;
 
     function setUp() public {
-        token = new TestSERC20("Test Token", "TST");
+        token = new TestSRC20("Test Token", "TST");
         token.mint(saddress(initialHolder), suint256(initialSupply));
     }
 

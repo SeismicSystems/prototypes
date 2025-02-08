@@ -5,7 +5,7 @@ pragma solidity ^0.8.20;
 /**
  * @dev Interface of the ERC-20 standard as defined in the ERC, modified for shielded types.
  */
-interface SIERC20 {
+interface SIRC20 {
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
      * another (`to`).

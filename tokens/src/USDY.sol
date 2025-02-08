@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.20;
 
-import {SERC20} from "./SERC20.sol";
+import {SRC20} from "./SRC20.sol";
 
 /**
  * @title USDY - Yield-bearing USD Stablecoin with Privacy Features
  * @notice A yield-bearing stablecoin that uses shielded types for privacy protection
- * @dev Implements SERC20 for shielded balances and transfers. This is a final implementation, not meant to be inherited from.
+ * @dev Implements SRC20 for shielded balances and transfers. This is a final implementation, not meant to be inherited from.
  */
-contract USDY is SERC20 {
+contract USDY is SRC20 {
     // Base value for rewardMultiplier (18 decimals)
     uint256 private constant BASE = 1e18;
     
@@ -53,7 +53,7 @@ contract USDY is SERC20 {
      * @notice Constructs the USDY contract
      * @param admin The address that will have admin rights
      */
-    constructor(address admin) SERC20("USD Yield", "USDY") {
+    constructor(address admin) SRC20("USD Yield", "USDY") {
         if (admin == address(0)) revert ERC20InvalidReceiver(admin);
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         rewardMultiplier = suint256(BASE); // Initialize with 1.0 multiplier
@@ -364,8 +364,8 @@ contract USDY is SERC20 {
     }
 
     /**
-     * @notice This is the exact same implementation as the one in SERC20.sol
-     * @dev See {SIERC20-allowance}.
+     * @notice This is the exact same implementation as the one in SRC20.sol
+     * @dev See {SIRC20-allowance}.
      * Returns actual allowance if caller is either the owner or the spender,
      * returns 0 otherwise to maintain privacy.
      */
