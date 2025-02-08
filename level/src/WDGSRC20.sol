@@ -159,6 +159,10 @@ abstract contract WDGSRC20 is ISRC20 {
         return msg.sender == trustedDePinServiceAddress || msg.sender == trustedAMMAddress;
     }
 
+    /// @notice Sets the time period before whitelisted actions are enabled
+    //   for all addresses. Resets every epoch.
+    /// @dev Only callable by the trusted DePIN service contract
+    /// @param _transferUnlockTime Number of blocks within an epoch before transfers are allowed
     function setTransferUnlockTime(suint256 _transferUnlockTime) external {
         require(msg.sender == trustedDePinServiceAddress, "Not authorized to set unlock time");
         transferUnlockTime = _transferUnlockTime;
