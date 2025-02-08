@@ -4,7 +4,7 @@ Welcome to the **Seismic** blockchain's **Prototypes** repository! This repo is 
 
 ## Purpose
 
- This repository exists for:
+This repository exists for:
 
 - **Reference & Examples:** Developers looking to understand the Seismic blockchain or seeking best practices can explore these prototypes as real-world examples.  
 - **Collaboration:** We encourage contributions, feedback, and discussions about all things Seismic. 
@@ -15,8 +15,10 @@ Each project in this repo lives in its own directory and includes a dedicated RE
 
 Below is a quick summary of each prototype currently available in this repository:
 
-1. **`Project 1 here`**  
-   Description here.
+1. **`tokens`**
+   - SERC20 Token Standard
+     - SIERC20 interface
+   - USDY, a yield-bearing stablecoin built on SERC20
 2. **`Project 2 here`**  
    Description here.
 
