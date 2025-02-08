@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import {Scwript, console} from "forge-std/Script.sol";
+import {Script, console} from "forge-std/Script.sol";
 import {USDY} from "../src/USDY.sol";
 
 contract USDYScript is Script {
