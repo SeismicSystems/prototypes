@@ -172,7 +172,7 @@ abstract contract WDGSRC20 is ISRC20 {
     /// @dev Used as a modifier for transfer-related functions, all addresses are whitelisted after unlock period
     modifier whitelisted() {
         require(
-            isTrusted() || suint256(block.number) % suint256(BLOCKS_PER_EPOCH) > transferUnlockTime,
+            isTrusted() || suint256(block.number) > transferUnlockTime,
             "Only trusted addresses can call this function"
         );
         _;

@@ -3,19 +3,19 @@ pragma solidity ^0.8.13;
 
 import {ISRC20} from "./SRC20.sol";
 import {WDGSRC20} from "./WDGSRC20.sol";
-import {PermissionedAMM} from "./PermissionedAMM.sol";
+import {InternalAMM} from "./InternalAMM.sol";
 
-/// @title WidgetInterface - DePIN Operator Reward Price Floor Protocol
+/// @title Level - DePIN Operator Reward Price Floor Protocol
 /// @notice This contract implements a price floor mechanism for DePIN operator rewards,
 /// ensuring operators can liquidate their rewards at a minimum guaranteed price.
 /// @dev Uses an AMM to maintain a price floor and implements epoch-based withdrawal limits
 /// to manage protocol liquidity
-contract WidgetInterface {
+contract Level {
     address public rewardOracle;
     uint256 public constant BLOCKS_PER_EPOCH = 7200; // about a day
     suint256 private maxWithdrawalPerEpoch; // the max usdc that can be withdrawn per epoch
 
-    PermissionedAMM public amm;
+    InternalAMM public amm;
     WDGSRC20 public WDG;
     ISRC20 public USDC;
 
@@ -43,7 +43,7 @@ contract WidgetInterface {
         WDG = WDGSRC20(_wdg);
         USDC = ISRC20(_usdc);
         maxWithdrawalPerEpoch = _maxWithdrawalPerEpoch;
-        amm = new PermissionedAMM(_wdg, _usdc);
+        amm = new InternalAMM(_wdg, _usdc);
 
         // set the wdg trusted addresses
         WDG.setTrustedDePinServiceAddress(address(this));

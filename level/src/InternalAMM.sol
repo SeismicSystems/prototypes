@@ -4,12 +4,12 @@ pragma solidity ^0.8.13;
 import {ISRC20} from "./SRC20.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 
-/// @title PermissionedAMM - Restricted Access Automated Market Maker
+/// @title InternalAMM - Restricted Access Automated Market Maker
 /// @notice A constant product AMM (x*y=k) that manages the liquidity pool for the DePIN price floor protocol
 /// @dev Uses shielded data types (suint256) for privacy-preserving calculations
 /// @dev All operations are restricted to the owner to so that even properties relevent to the caller,
 //       e.g. price, can't be observed until the owner wishes to reveal them
-contract PermissionedAMM is Ownable(msg.sender) {
+contract InternalAMM is Ownable(msg.sender) {
     ISRC20 public token0;
     ISRC20 public token1;
 

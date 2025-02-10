@@ -3,9 +3,9 @@ pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
 
-import {PermissionedAMM} from "../src/PermissionedAMM.sol";
+import {InternalAMM} from "../src/InternalAMM.sol";
 import {WDGSRC20} from "../src/WDGSRC20.sol";
-import {WidgetInterface} from "../src/WidgetInterface.sol";
+import {Level} from "../src/Level.sol";
 import {ISRC20} from "../src/SRC20.sol";
 import {MockSRC20, MockWDGSRC20} from "./utils/MockSrc20.sol";
 
@@ -15,14 +15,14 @@ contract TestAMM is Test {
     address ammOwnerAddress = address(0x1);
     WDGSRC20 public WDG;
     MockSRC20 public USDC;
-    PermissionedAMM public amm;
+    InternalAMM public amm;
 
     function setUp() public {
         USDC = new MockSRC20("USDC", "USDC", 18);
         WDG = new MockWDGSRC20("WDG", "WDG", 18);
 
         vm.prank(ammOwnerAddress);
-        amm = new PermissionedAMM(address(WDG), address(USDC));
+        amm = new InternalAMM(address(WDG), address(USDC));
 
         WDG.setTrustedDePinServiceAddress(ammOwnerAddress);
         WDG.setTrustedAMMAddress(address(amm));
