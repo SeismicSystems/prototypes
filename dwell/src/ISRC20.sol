@@ -46,8 +46,6 @@ interface ISRC20 {
      * Returns a boolean value indicating whether the operation succeeded,
      * otherwise reverts.
      *
-     * Emits a {Transfer} event.
-     *
      * Expected that implementation calls emitTransfer.
      */
     function transfer(saddress to, suint256 value) external returns (bool);
@@ -60,8 +58,6 @@ interface ISRC20 {
      * This value changes when {approve} or {transferFrom} are called.
      * For privacy reasons, returns actual allowance only if caller is either owner or spender,
      * otherwise reverts.
-     * 
-     * Expected that implementation calls emitApproval.
      */
     function allowance(saddress owner, saddress spender) external view returns (uint256);
 
@@ -71,7 +67,7 @@ interface ISRC20 {
      *
      * Returns a boolean value indicating whether the operation succeeded.
      *
-     * Emits an {Approval} event.
+     * Expected that implementation calls emitApproval.
      */
     function approve(saddress spender, suint256 value) external returns (bool);
 
@@ -82,8 +78,6 @@ interface ISRC20 {
      *
      * Returns a boolean value indicating whether the operation succeeded.
      *
-     * Emits a {Transfer} event.
-     * 
      * Expected that implementation calls emitTransfer.
      */
     function transferFrom(saddress from, saddress to, suint256 value) external returns (bool);
