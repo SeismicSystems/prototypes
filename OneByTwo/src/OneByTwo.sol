@@ -86,7 +86,7 @@ contract OneByTwo{
         return uint(customerSpend[msg.sender][user_]);
     }
 
-    //View function for a user to check their spend at a given restaurant. 
+    // View function for a user to check their spend at a given restaurant. 
     // reverts if caller is not a registered restaurant address.
     // Note that the resturant can only check their own data
     function checkSpendCustomer(address restaurant_) public view reqIsRestaurant(restaurant_) returns (uint256){
@@ -119,5 +119,12 @@ contract OneByTwo{
             revert("Payment Failed");
         }
     }
+
+
+    // TODO: change comments to natspec
+    // TODO: adjust rewards math
+    // requires give early / regular users more rewards
+    // requires tokenomics that make sense for the restaurant, e.g. can withdraw money if restuarent doesn't hold token themselves
+    // requires adjusting test cases to reflect new rewards
 
 }
