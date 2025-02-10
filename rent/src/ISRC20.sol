@@ -36,14 +36,17 @@ interface ISRC20 {
     /**
      * @dev Returns the value of tokens owned by `account`.
      * For privacy reasons, returns actual balance only if caller is the account owner,
-     * otherwise returns 0.
+     * otherwise reverts.
+     * 
+     * Expected that implementation calls emitTransfer.
      */
     function balanceOf(saddress account) external view returns (uint256);
 
     /**
      * @dev Moves a shielded `value` amount of tokens from the caller's account to `to`.
      *
-     * Returns a boolean value indicating whether the operation succeeded.
+     * Returns a boolean value indicating whether the operation succeeded,
+     * otherwise reverts.
      *
      * Emits a {Transfer} event with zero values to maintain privacy.
      */
@@ -56,7 +59,9 @@ interface ISRC20 {
      *
      * This value changes when {approve} or {transferFrom} are called.
      * For privacy reasons, returns actual allowance only if caller is either owner or spender,
-     * otherwise returns 0.
+     * otherwise reverts.
+     * 
+     * Expected that implementation calls emitApproval.
      */
     function allowance(saddress owner, saddress spender) external view returns (uint256);
 
@@ -78,6 +83,8 @@ interface ISRC20 {
      * Returns a boolean value indicating whether the operation succeeded.
      *
      * Emits a {Transfer} event with zero values to maintain privacy.
+     * 
+     * Expected that implementation calls emitTransfer.
      */
     function transferFrom(saddress from, saddress to, suint256 value) external returns (bool);
 }

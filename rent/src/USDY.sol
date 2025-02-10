@@ -381,7 +381,6 @@ contract USDY is SRC20 {
     function approve(saddress spender, suint256 amount) public override whenNotPaused returns (bool) {
         address owner = _msgSender();
         if (owner == address(0)) revert ERC20InvalidSpender(address(0));
-        emit Approval(owner, address(spender), uint256(amount));
         return super.approve(spender, amount);
     }
 
@@ -393,10 +392,6 @@ contract USDY is SRC20 {
      * @return A boolean value indicating whether the operation succeeded
      */
     function increaseAllowance(saddress spender, suint256 addedValue) public virtual override whenNotPaused returns (bool) {
-        address owner = _msgSender();
-        uint256 currentAllowance = allowance(saddress(owner), spender);
-        suint256 newAllowance = suint256(currentAllowance) + addedValue;
-        emit Approval(owner, address(spender), uint256(newAllowance));
         return super.increaseAllowance(spender, addedValue);
     }
 
@@ -415,8 +410,6 @@ contract USDY is SRC20 {
             revert ERC20InsufficientAllowance(address(spender), currentAllowance, subtractedAmount);
         }
         unchecked {
-            uint256 newAllowance = currentAllowance - subtractedAmount;
-            emit Approval(owner, address(spender), newAllowance);
             return super.decreaseAllowance(spender, subtractedValue);
         }
     }
