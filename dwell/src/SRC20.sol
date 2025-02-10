@@ -240,7 +240,7 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
      * This internal function is equivalent to {transfer}, and can be used to
      * e.g. implement automatic token fees, slashing mechanisms, etc.
      *
-     * Emits a {Transfer} event.
+     * Calls emitTransfer.
      *
      * NOTE: This function is not virtual, {_update} should be overridden instead.
      */
@@ -297,7 +297,7 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
      * @dev Creates a shielded `value` amount of tokens and assigns them to a shielded `account`.
      * Relies on the `_update` mechanism.
      *
-     * Emits a {Transfer} event.
+     * Calls emitTransfer.
      *
      * NOTE: This function is not virtual, {_update} should be overridden instead.
      */
@@ -312,7 +312,7 @@ abstract contract SRC20 is Context, ISRC20, ISRC20Metadata, IERC20Errors {
      * @dev Destroys a shielded `value` amount of tokens from a shielded `account`, lowering the total supply.
      * Relies on the `_update` mechanism.
      *
-     * Emits a {Transfer} event with `to` set to the zero address.
+     * Calls emitTransfer.
      *
      * NOTE: This function is not virtual, {_update} should be overridden instead
      */
