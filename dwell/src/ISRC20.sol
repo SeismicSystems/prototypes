@@ -48,7 +48,7 @@ interface ISRC20 {
      * Returns a boolean value indicating whether the operation succeeded,
      * otherwise reverts.
      *
-     * Emits a {Transfer} event with zero values to maintain privacy.
+     * Emits a {Transfer} event.
      */
     function transfer(saddress to, suint256 value) external returns (bool);
 
@@ -71,7 +71,7 @@ interface ISRC20 {
      *
      * Returns a boolean value indicating whether the operation succeeded.
      *
-     * Emits an {Approval} event with zero values to maintain privacy.
+     * Emits an {Approval} event.
      */
     function approve(saddress spender, suint256 value) external returns (bool);
 
@@ -82,7 +82,7 @@ interface ISRC20 {
      *
      * Returns a boolean value indicating whether the operation succeeded.
      *
-     * Emits a {Transfer} event with zero values to maintain privacy.
+     * Emits a {Transfer} event.
      * 
      * Expected that implementation calls emitTransfer.
      */
