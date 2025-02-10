@@ -4,10 +4,10 @@ Welcome to the **Seismic** blockchain's **Prototypes** repository! This repo is 
 
 ## Purpose
 
- This repository exists for:
+This repository exists for:
 
-- **Reference & Examples:** Developers looking to understand the Seismic blockchain or seeking best practices can explore these prototypes as real-world examples.  
-- **Collaboration:** We encourage contributions, feedback, and discussions about all things Seismic. 
+- **Reference & Examples:** Developers looking to understand the Seismic blockchain or seeking best practices can explore these prototypes as real-world examples.
+- **Collaboration:** We encourage contributions, feedback, and discussions about all things Seismic.
 
 Each project in this repo lives in its own directory and includes a dedicated README that provides more details.
 
@@ -15,16 +15,13 @@ Each project in this repo lives in its own directory and includes a dedicated RE
 
 Below is a quick summary of each prototype currently available in this repository:
 
-1. **`Project 1 here`**  
-   Description here.
-2. **`Project 2 here`**  
-   Description here.
-
+1. **`OneByTwo`**  
+   Revenue share for restaurant regulars.
 
 ## Contributing
 
-1. **Fork** this repository.  
-2. **Create** a new branch for your prototype or feature.  
+1. **Fork** this repository.
+2. **Create** a new branch for your prototype or feature.
 3. **Add** your prototype in a new directory, including a `README.md` with setup instructions and information on your project. Additionally, include a 1-2 sentence summary of the project in this top-level `README.md`.
 4. **Open** a pull request describing your changes and why they're valuable.
 
@@ -34,7 +31,7 @@ We're excited to see what you build and look forward to collaborating on the fut
 
 ## Get in Touch
 
-- **Website:** [Seismic Blockchain](https://www.seismic.systems)  
-- **Twitter:** [@SeismicSys](https://x.com/SeismicSys) 
+- **Website:** [Seismic Blockchain](https://www.seismic.systems)
+- **Twitter:** [@SeismicSys](https://x.com/SeismicSys)
 
 If you have any questions or want to propose a new idea, please open an issue or reach out on our official channels. Thank you for being an early part of the Seismic ecosystem!

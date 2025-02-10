@@ -3,13 +3,10 @@ pragma solidity ^0.8.13;
 
 // contract goals
 /* Restaurant Token Contracts
-Tokens can be distributed to customers by the restaurant, or (if allowed), traded on the secondary market.
-Will only allow transactions between clients and the restaurant address, or all transactions depending on permissions.
-
-Successfully sending a token from a restaurant to a user,
-successfully blocking a token send for a user to another user,
-successfully sending a token from a user back to the original restaurant.
+Tokens can be distributed to customers by the restaurant, and can be sent back to said restaurants.
+No other transactions will be allowed.
 */
+
 import { ISRC20 } from "./ISRC20.sol";
 import { SRC20 } from "./SRC20.sol";
 
@@ -19,29 +16,27 @@ contract OneByTwo{
     uint256 public restaurantCount;
     uint256 constant TOKEN_SUPPLY = 1e24;
 
-    //mapping for searching through users via address, also might be cool to shield the addresses here? Just so I can get a sense
-    // of the s-types in practice.
+    //This mapping gets the token address of each restaurants token given the address of the
+    // restaurant user.
     mapping(address=>address) public restaurantsTokens;
 
-    // how much rev has gone to each restaurant
+    //This mapping gets the total revenue a restaurant has recieved given the address of the
+    // restaurant user. The revenue is stored as a suint to shield it from observers.
     mapping(address=>suint256) internal restaurantRevenue;
 
-    //keep track of spend per person
+    //This mapping keeps track of the spend contributed by individual users. It does this
+    //by mapping the restaurant address to another mapping of all user addresses and their
+    //relevant spend amounts at the given restaurant. The value is shielded from observers.
     mapping(address=>mapping(address=>suint256)) internal userSpend;
 
-    event Register(address Restaurant_, address tokenAddress);   // Event of a new address registering as R
-
-    // restaurants listen to this
-    event SpentAtRestaurant(address Restaurant_, address Consumer_);
-
-    // Thought here is that people can see when certain restaurants have tokens up for grabs, but
-    // can't see who has them right now, or who returned them. Only public user info is whether a given address
-    // is registered, but even then 
+    event Register(address Restaurant_, address tokenAddress);   // Event of a new address registering as a restaurant
+    event SpentAtRestaurant(address Restaurant_, address Consumer_); //Event of a user spending at a restaurant
 
     constructor() {
     }
 
-    // Function to register new users and then log the event via emit. For both R and C.
+    // Function to register new restaurants. Handles token minting and delegation, keeps 
+    // restaurant count up to date, and then emits the relevant event.
     function registerRestaurant(string calldata name_, string calldata symbol_) public {
 
         if (restaurantsTokens[msg.sender] != address(0)) {
@@ -56,6 +51,8 @@ contract OneByTwo{
         emit Register(msg.sender, address(token));
     }
 
+    // Function to track spending by users at restaurants. Updates restaurant total revenue and user spend
+    // metrics. Emits the relevant event.
     function spendAtRestaurant(address restaurant_) public payable {
 
         if (restaurantsTokens[restaurant_] == address(0)) {
@@ -69,6 +66,7 @@ contract OneByTwo{
 
     }
 
+    //View function to check the total spend at a given restaurant.
     function checkTotalSpendRestaurant() public view returns (uint256){
 
         if (restaurantsTokens[msg.sender] == address(0)) {
@@ -78,6 +76,8 @@ contract OneByTwo{
         return uint(restaurantRevenue[msg.sender]);
     }
 
+    //View function for a restaurant to check a specific users spend. Not restaurants
+    //can only check the spend of the user at their address - not for any other restaurant.
     function checkUserSpendRestaurant(address user_) public view returns (uint256){
 
         if (restaurantsTokens[msg.sender] == address(0)) {
@@ -88,6 +88,8 @@ contract OneByTwo{
 
     }
 
+    //View function for a user to check their spend at a given restaurant. Note that
+    //the can only place themselves as a user - not any abstract address.
     function checkSpendUser(address restaurant_) public view returns (uint256){
 
         if (restaurantsTokens[restaurant_] == address(0)) {
@@ -98,6 +100,8 @@ contract OneByTwo{
 
     }
 
+    //checkOut() allows a user to trade in their tokens for a given restaurant
+    // for their respective portion of the revenue pool.
     function checkOut(address restaurant_, suint256 amount) public {
 
         address tokenAddress = restaurantsTokens[restaurant_];
