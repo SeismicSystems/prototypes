@@ -37,8 +37,6 @@ interface ISRC20 {
      * @dev Returns the value of tokens owned by `account`.
      * For privacy reasons, returns actual balance only if caller is the account owner,
      * otherwise reverts.
-     * 
-     * Expected that implementation calls emitTransfer.
      */
     function balanceOf(saddress account) external view returns (uint256);
 
@@ -49,6 +47,8 @@ interface ISRC20 {
      * otherwise reverts.
      *
      * Emits a {Transfer} event.
+     *
+     * Expected that implementation calls emitTransfer.
      */
     function transfer(saddress to, suint256 value) external returns (bool);
 
