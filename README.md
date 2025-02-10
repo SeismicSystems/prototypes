@@ -15,12 +15,8 @@ Each project in this repo lives in its own directory and includes a dedicated RE
 
 Below is a quick summary of each prototype currently available in this repository:
 
-1. **`rent`**
-   Contracts for a rent platform where tenants can pay their rent with a yield-bearing stablecoin.
-
-   - SRC20 Token Standard
-   - ISRC20 interface
-   - USDY, a yield-bearing stablecoin built on SRC20
+1. **`dwell`**
+   Pay your rent with a yield-bearing stablecoin
 
 2. **`Project 2 here`**  
    Description here.

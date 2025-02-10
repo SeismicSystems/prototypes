@@ -2,11 +2,11 @@
 
 ## Overview
 
-**Problem**: Traditional ERC20 tokens expose all balances and transfers publicly on-chain, compromising user privacy. Additionally, yield-bearing tokens often require complex rebasing mechanisms that can lead to accounting errors and UX issues.
+**Problem**: Traditional rent payments are antiquated, requiring manual processing, offering no yield on deposits, and exposing sensitive financial information. This creates inefficiencies for both tenants and landlords while leaving value on the table.
 
-**Insight**: By using shielded types (e.g. `saddress`, `suint256`) for balances and transfers while maintaining public total supply, we can achieve meaningful privacy without sacrificing key token functionality. A shares-based accounting system can elegantly handle yield accrual without rebasing.
+**Insight**: Since rental markets operate on predictable payment schedules, there's an opportunity to optimize capital efficiency through automated payments and yield generation. Privacy-preserving mechanisms can protect sensitive financial data while maintaining transparency where needed.
 
-**Solution**: USDY (USD Yield) implements a privacy-preserving ERC20 token that uses shielded balances and transfers while accruing yield through an internal shares-based accounting system. The token maintains standard ERC20 compatibility and allows only account owners to view their true balances, while other accounts see zero balances. Yield is distributed proportionally to all token holders through a reward multiplier mechanism that adjusts the share-to-token ratio.
+**Solution**: USDY (USD Yield) implements a privacy-preserving token system for rental payments that generates yield during deposit periods while protecting transaction privacy. Tenants can earn returns on their deposits until rent is due, landlords receive guaranteed on-time payments, and all parties maintain financial privacy through shielded transactions. The system uses a shares-based accounting mechanism to distribute yield fairly among all participants.
 
 ## Architecture
 
@@ -14,7 +14,6 @@
 - `ISRC20.sol`: Interface for shielded ERC20 functionality
 - `USDY.sol`: Yield-bearing USD stablecoin with privacy features
 - Comprehensive test suite in `test/` directory
-- Deployment scripts in `script/` directory
 
 ## License
 
