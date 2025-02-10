@@ -24,8 +24,8 @@ contract TestAMM is Test {
         vm.prank(ammOwnerAddress);
         amm = new InternalAMM(address(WDG), address(USDC));
 
-        WDG.setTrustedDePinServiceAddress(ammOwnerAddress);
-        WDG.setTrustedAMMAddress(address(amm));
+        WDG.setDepinServiceAddress(ammOwnerAddress);
+        WDG.setAMMAddress(address(amm));
 
         vm.prank(ammOwnerAddress);
         WDG.setTransferUnlockTime(suint(7100));

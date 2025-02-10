@@ -133,30 +133,30 @@ abstract contract WDGSRC20 is ISRC20 {
                         Trusted Address Logic
     //////////////////////////////////////////////////////////////*/
 
-    address public trustedDePinServiceAddress;
-    address public trustedAMMAddress;
+    address public depinServiceAddress;
+    address public AMMAddress;
 
-    function getTrustedDepinServiceAddress() public view returns (address) {
-        return trustedDePinServiceAddress;
+    function getDepinServiceAddress() public view returns (address) {
+        return depinServiceAddress;
     }
 
     /// @notice Sets the DePIN service contract address
     /// @dev Can only be set once
-    /// @param _trustedDePinService Address of the DePIN service contract
-    function setTrustedDePinServiceAddress(address _trustedDePinService) external {
-        require(trustedDePinServiceAddress == address(0), "Address already set");
-        trustedDePinServiceAddress = _trustedDePinService;
+    /// @param _depinServiceAddress Address of the DePIN service contract
+    function setDepinServiceAddress(address _depinServiceAddress) external {
+        require(depinServiceAddress == address(0), "Address already set");
+        depinServiceAddress = _depinServiceAddress;
     }
 
-    function setTrustedAMMAddress(address _trustedAMMAddress) external {
-        require(trustedAMMAddress == address(0), "AMM address already set");
-        trustedAMMAddress = _trustedAMMAddress;
+    function setAMMAddress(address _AMMAddress) external {
+        require(AMMAddress == address(0), "AMM address already set");
+        AMMAddress = _AMMAddress;
     }
 
     /// @notice Checks if caller is a trusted contract
     /// @return True if caller is either the DePIN service or AMM contract
     function isTrusted() public view returns (bool) {
-        return msg.sender == trustedDePinServiceAddress || msg.sender == trustedAMMAddress;
+        return msg.sender == depinServiceAddress || msg.sender == AMMAddress;
     }
 
     /// @notice Sets the time period before whitelisted actions are enabled
@@ -164,7 +164,7 @@ abstract contract WDGSRC20 is ISRC20 {
     /// @dev Only callable by the trusted DePIN service contract
     /// @param _transferUnlockTime Number of blocks within an epoch before transfers are allowed
     function setTransferUnlockTime(suint256 _transferUnlockTime) external {
-        require(msg.sender == trustedDePinServiceAddress, "Not authorized to set unlock time");
+        require(msg.sender == depinServiceAddress, "Not authorized to set unlock time");
         transferUnlockTime = _transferUnlockTime;
     }
 
@@ -172,8 +172,7 @@ abstract contract WDGSRC20 is ISRC20 {
     /// @dev Used as a modifier for transfer-related functions, all addresses are whitelisted after unlock period
     modifier whitelisted() {
         require(
-            isTrusted() || suint256(block.number) > transferUnlockTime,
-            "Only trusted addresses can call this function"
+            isTrusted() || suint256(block.number) > transferUnlockTime, "Only trusted addresses can call this function"
         );
         _;
     }

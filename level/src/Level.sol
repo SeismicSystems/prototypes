@@ -6,10 +6,9 @@ import {WDGSRC20} from "./WDGSRC20.sol";
 import {InternalAMM} from "./InternalAMM.sol";
 
 /// @title Level - DePIN Operator Reward Price Floor Protocol
-/// @notice This contract implements a price floor mechanism for DePIN operator rewards,
-/// ensuring operators can liquidate their rewards at a minimum guaranteed price.
-/// @dev Uses an AMM to maintain a price floor and implements epoch-based withdrawal limits
-/// to manage protocol liquidity
+/// @notice This contract implements a minimum price guarantee mechanism for DePIN operator rewards,
+/// ensuring operators can liquidate their rewards at a guaranteed minimum price.
+/// @dev Uses an AMM to provide price guarantees and implements epoch-based withdrawal limits
 contract Level {
     address public rewardOracle;
     uint256 public constant BLOCKS_PER_EPOCH = 7200; // about a day
@@ -46,13 +45,13 @@ contract Level {
         amm = new InternalAMM(_wdg, _usdc);
 
         // set the wdg trusted addresses
-        WDG.setTrustedDePinServiceAddress(address(this));
-        WDG.setTrustedAMMAddress(address(amm));
+        WDG.setDepinServiceAddress(address(this));
+        WDG.setAMMAddress(address(amm));
         WDG.setTransferUnlockTime(_transferUnlockTime);
     }
 
     /// @notice Processes user payments for DePIN services
-    /// @dev Payments are used to maintain the price floor through token buybacks
+    /// @dev Payments are used to support the price guarantee through token buybacks
     /// @param usdcAmount Amount of USDC to pay for services
     function payForService(suint256 usdcAmount) public {
         // transfer USDC from user to this contract
@@ -70,7 +69,7 @@ contract Level {
         //
     }
 
-    /// @notice Internal buyback mechanism to maintain price floor
+    /// @notice Internal buyback mechanism to support price guarantees
     /// @dev Converts service payments to WDG tokens and burns them, supporting token value
     /// @param usdcAmount Amount of USDC to use for buyback
     function _serviceBuyback(suint256 usdcAmount) internal {
@@ -91,6 +90,8 @@ contract Level {
 
     /// @notice Checks operator's remaining withdrawal capacity for the current epoch
     /// @dev Enforces epoch-based withdrawal limits to manage protocol liquidity
+    /// @dev TODO: Future versions should decouple withdrawal caps from token sales to allow
+    /// operators to manage their token exposure without affecting their withdrawal limits
     /// @return Maximum amount of USDC that can currently be withdrawn in current epoch
     function calcWithdrawalCap() internal returns (suint256) {
         // reset the withdrawal cap if the user has not withdrawn in the current epoch
@@ -106,13 +107,17 @@ contract Level {
         return _min(maxWithdrawalPerEpoch, usdcBalance);
     }
 
-    // user facing function to view their current withdrawal cap
+    /// @notice Returns the maximum amount of USDC an operator can currently withdraw
+    /// @dev Provides a view into the operator's withdrawal capacity for the current epoch
+    /// without modifying state. Useful for UIs and off-chain calculations.
+    /// @return The maximum amount of USDC that can be withdrawn in the current epoch,
+    /// limited by both the epoch withdrawal cap and the operator's WDG balance
     function viewWithdrawalCap() public returns (uint256) {
         return uint256(calcWithdrawalCap());
     }
 
-    /// @notice Allows operators to liquidate their reward tokens at the guaranteed minimum price
-    /// @dev Converts WDG to USDC through AMM at the protocol-maintained price floor
+    /// @notice Allows operators to liquidate their reward tokens at the guaranteed price
+    /// @dev Converts WDG to USDC through AMM at the protocol-guaranteed price
     /// @param _amount Amount of USDC to withdraw
     function operatorWithdraw(suint256 _amount) public {
         suint256 withdrawalCap = calcWithdrawalCap(); // max usdc that user can withdraw
