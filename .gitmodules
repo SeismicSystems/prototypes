@@ -1,6 +1,6 @@
 [submodule "rent/lib/forge-std"]
-	path = rent/lib/forge-std
+	path = dwell/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
 [submodule "rent/lib/openzeppelin-contracts"]
-	path = rent/lib/openzeppelin-contracts
+	path = dwell/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
