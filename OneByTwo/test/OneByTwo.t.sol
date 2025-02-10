@@ -46,7 +46,7 @@ contract OneByTwoTest is Test {
         onebytwo.spendAtRestaurant(unregisteredRestaurant);
     }
 
-    /// @notice Spending at a registered restaurant updates revenue and user spend correctly.
+    /// @notice Spending at a registered restaurant updates revenue and Customer spend correctly.
     function test_spendAtRestaurantUpdatesRevenue() public {
         // Use a different address for the restaurant.
         address restaurant = address(0x123);
@@ -67,13 +67,13 @@ contract OneByTwoTest is Test {
 
         // Check that the restaurant can view this consumer’s spend.
         vm.prank(restaurant);
-        uint256 userSpendAmount = onebytwo.checkUserSpendRestaurant(consumer);
-        assertEq(userSpendAmount, spendAmount);
+        uint256 CustomerSpendAmount = onebytwo.checkCustomerSpendRestaurant(consumer);
+        assertEq(CustomerSpendAmount, spendAmount);
 
         // Check that the consumer can view his/her spend at the restaurant.
         vm.prank(consumer);
-        uint256 spendUser = onebytwo.checkSpendUser(restaurant);
-        assertEq(spendUser, spendAmount);
+        uint256 spendCustomer = onebytwo.checkSpendCustomer(restaurant);
+        assertEq(spendCustomer, spendAmount);
     }
 
     /// @notice Multiple spends from the same consumer should accumulate.
@@ -96,12 +96,12 @@ contract OneByTwoTest is Test {
         assertEq(totalRevenue, spend1 + spend2);
 
         vm.prank(restaurant);
-        uint256 userSpendAmount = onebytwo.checkUserSpendRestaurant(consumer);
-        assertEq(userSpendAmount, spend1 + spend2);
+        uint256 CustomerSpendAmount = onebytwo.checkCustomerSpendRestaurant(consumer);
+        assertEq(CustomerSpendAmount, spend1 + spend2);
 
         vm.prank(consumer);
-        uint256 spendUser = onebytwo.checkSpendUser(restaurant);
-        assertEq(spendUser, spend1 + spend2);
+        uint256 spendCustomer = onebytwo.checkSpendCustomer(restaurant);
+        assertEq(spendCustomer, spend1 + spend2);
     }
 
     /// @notice Multiple spends from the different consumers should accumulate.
@@ -133,20 +133,20 @@ contract OneByTwoTest is Test {
         assertEq(totalRevenue, 2 * (spend1 + spend2));
 
         vm.prank(restaurant);
-        uint256 userSpendAmount = onebytwo.checkUserSpendRestaurant(consumer);
-        assertEq(userSpendAmount, spend1 + spend2);
+        uint256 CustomerSpendAmount = onebytwo.checkCustomerSpendRestaurant(consumer);
+        assertEq(CustomerSpendAmount, spend1 + spend2);
     
         vm.prank(restaurant);
-        uint256 userSpendAmount2 = onebytwo.checkUserSpendRestaurant(consumer2);
-        assertEq(userSpendAmount2, spend1 + spend2);
+        uint256 CustomerSpendAmount2 = onebytwo.checkCustomerSpendRestaurant(consumer2);
+        assertEq(CustomerSpendAmount2, spend1 + spend2);
 
         vm.prank(consumer);
-        uint256 spendUser = onebytwo.checkSpendUser(restaurant);
-        assertEq(spendUser, spend1 + spend2);
+        uint256 spendCustomer = onebytwo.checkSpendCustomer(restaurant);
+        assertEq(spendCustomer, spend1 + spend2);
 
         vm.prank(consumer2);
-        uint256 spendUser2 = onebytwo.checkSpendUser(restaurant);
-        assertEq(spendUser2, spend1 + spend2);
+        uint256 spendCustomer2 = onebytwo.checkSpendCustomer(restaurant);
+        assertEq(spendCustomer2, spend1 + spend2);
     }
 
     /// @notice Only a registered restaurant can call checkTotalSpendRestaurant.
@@ -155,17 +155,17 @@ contract OneByTwoTest is Test {
         onebytwo.checkTotalSpendRestaurant();
     }
 
-    /// @notice Only a registered restaurant can call checkUserSpendRestaurant.
-    function test_checkUserSpendRestaurantNonRegistered() public {
+    /// @notice Only a registered restaurant can call checkCustomerSpendRestaurant.
+    function test_checkCustomerSpendRestaurantNonRegistered() public {
         vm.expectRevert("restaurant is not registered");
-        onebytwo.checkUserSpendRestaurant(address(0x234));
+        onebytwo.checkCustomerSpendRestaurant(address(0x234));
     }
 
-    /// @notice A consumer calling checkSpendUser for an unregistered restaurant should revert.
-    function test_checkSpendUserNonRegisteredRestaurant() public {
+    /// @notice A consumer calling checkSpendCustomer for an unregistered restaurant should revert.
+    function test_checkSpendCustomerNonRegisteredRestaurant() public {
         address unregisteredRestaurant = address(0x123);
         vm.expectRevert("restaurant is not registered");
-        onebytwo.checkSpendUser(unregisteredRestaurant);
+        onebytwo.checkSpendCustomer(unregisteredRestaurant);
     }
 
     /// @notice Test that the SpentAtRestaurant event is emitted with the correct parameters.
