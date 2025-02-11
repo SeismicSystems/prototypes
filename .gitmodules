@@ -4,3 +4,10 @@
 [submodule "rent/lib/openzeppelin-contracts"]
 	path = dwell/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+
+[submodule "riff/lib/forge-std"]
+	path = riff/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "riff/lib/solmate"]
+	path = riff/lib/solmate
+	url = https://github.com/Rari-Capital/solmate

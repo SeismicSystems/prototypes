@@ -15,11 +15,10 @@ Each project in this repo lives in its own directory and includes a dedicated RE
 
 Below is a quick summary of each prototype currently available in this repository:
 
-1. **`dwell`**
-   Pay your rent with a yield-bearing stablecoin
-
-2. **`Project 2 here`**  
-   Description here.
+1. **`RIFF`**  
+   Listen to a bonding curve.
+1. **`DWELL`**  
+   Pay your rent with a yield-bearing stablecoin.
 
 ## Contributing
 
