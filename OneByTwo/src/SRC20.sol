@@ -27,6 +27,7 @@ contract SRC20 is ISRC20 {
     uint8 public immutable decimals;
     saddress internal mintTo; 
     address public owner;
+    address public authorizedMinter;
 
     /*//////////////////////////////////////////////////////////////
                               ERC20 STORAGE
@@ -111,6 +112,11 @@ contract SRC20 is ISRC20 {
         }
         // emit Transfer(msg.sender, address(to), uint256(amount));
         return true;
+    }
+
+    function setAuthorizedMinter(address _minter) external {
+        require(msg.sender == mintTo, "Only original restaurant can set authorized minter");
+        authorizedMinter = _minter;
     }
 
     function mint(saddress to, suint256 amount) external {
