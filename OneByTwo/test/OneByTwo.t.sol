@@ -135,7 +135,7 @@ contract OneByTwoTest is Test {
         vm.prank(restaurant);
         uint256 CustomerSpendAmount = onebytwo.checkCustomerSpendRestaurant(consumer);
         assertEq(CustomerSpendAmount, spend1 + spend2);
-    
+
         vm.prank(restaurant);
         uint256 CustomerSpendAmount2 = onebytwo.checkCustomerSpendRestaurant(consumer2);
         assertEq(CustomerSpendAmount2, spend1 + spend2);
@@ -288,7 +288,7 @@ contract OneByTwoTest is Test {
 
         address tokenAddress = onebytwo.restaurantsTokens(restaurant);
         ISRC20 token = ISRC20(tokenAddress);
-        
+
         // Have the customer call spendAtRestaurant sending spendAmount ETH.
         // This call should update the revenue, track customer spend, and mint tokens to the customer.
         vm.prank(customer);
@@ -321,7 +321,7 @@ contract OneByTwoTest is Test {
         // In checkOut the entitlement is computed as:
         //     entitlement = (amount * totalRev) / token.totalSupply()
         // where:
-        // - amount = customerTokenBalance (spent tokens)
+        // - amount = # of tokens the customer wants to cash out
         // - totalRev = spendAmount (since spendAtRestaurant updates revenue with msg.value)
         // - token.totalSupply() = initial supply (set in registerRestaurant) + tokens minted during spendAtRestaurant
         uint256 totalRev = spendAmount;
@@ -348,14 +348,10 @@ contract OneByTwoTest is Test {
 
         // ----------- STEP 4: Verify Tokens Were Transferred -----------
         // After checkout, the customer's tokens should have been transferred to the restaurant.
-        
+
         vm.prank(customer);
         uint256 customerTokenBalanceAfter = token.balanceOf();
-        
-        assertEq(
-            customerTokenBalanceAfter,
-            0,
-            "Customer token balance should be zero after checkout"
-        );
+
+        assertEq(customerTokenBalanceAfter, 0, "Customer token balance should be zero after checkout");
     }
 }

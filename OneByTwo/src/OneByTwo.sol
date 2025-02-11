@@ -1,55 +1,70 @@
 // SPDX-License-Identifier: MIT License
 pragma solidity ^0.8.13;
 
-// contract goals
-/* Restaurant Token Contracts
-Tokens can be distributed to customers by the restaurant, and can be sent back to said restaurants.
-No other transactions will be allowed.
-*/
+/**
+ * @title Restaurant Revenue Sharing and Token System
+ * @dev This contract allows restaurants to register, mint tokens, track customer spending,
+ * and facilitate revenue sharing through token redemption.
+ */
+import {ISRC20} from "./ISRC20.sol";
+import {SRC20} from "./SRC20.sol";
 
-import { ISRC20 } from "./ISRC20.sol";
-import { SRC20 } from "./SRC20.sol";
-
-contract OneByTwo{
-
-    //The number of consumers and restaurants should be publically accessible. 
+contract OneByTwo {
+    /// @notice The total number of registered restaurants.
     uint256 public restaurantCount;
 
-    // starting token balance distributed to the restaurant owners
+    /// @notice The percentage of revenue that will be distributed to token holders.
     uint256 constant SHARE_PERCENTAGE = 10; //The percent of revenue willing to be distributed.
 
+    /// @notice Maps a restaurant (owner) address to its respective SRC20 token contract address.
+    // mapping(restaurant (owner) address => restaurant's SRC20 token)
+    mapping(address => address) public restaurantsTokens;
 
-    mapping(address=>address) public restaurantsTokens; // mapping(restaurant (owner) address => restaurant's SRC20 token)
-    mapping(address=>suint256) internal restaurantTotalRevenue; // mapping(restauraunt address => total revenue)
-    mapping(address=>mapping(address=>suint256)) internal customerSpend; // mapping(restaurant address => mapping(customer address => spend amount))
+    /// @dev Maps a restaurant address to its total accumulated revenue.
+    // mapping(restauraunt address => total revenue)
+    mapping(address => suint256) internal restaurantTotalRevenue;
 
-    event Register(address Restaurant_, address tokenAddress);   // Event of a new address registering as a restaurant
+    /// @dev Tracks how much each customer has spent at a specific restaurant.
+    // mapping(restaurant address => mapping(customer address => spend amount))
+    mapping(address => mapping(address => suint256)) internal customerSpend;
+
+    /// @notice Emitted when a new restaurant registers and its token is created.
+    /// @param Restaurant_ The address of the restaurant owner.
+    /// @param tokenAddress The address of the newly created SRC20 token contract.
+    event Register(address Restaurant_, address tokenAddress);
+
+    /// @notice Emitted when a consumer spends at a restaurant.
+    /// @param Restaurant_ The address of the restaurant where the transaction occurred.
+    /// @param Consumer_ The address of the consumer who spent money.
     event SpentAtRestaurant(address Restaurant_, address Consumer_); //Event of a user spending at a restaurant
 
-    constructor() {
-    }
-
-    // modifier to check that the caller is a registered restaurant
+    /// @dev Ensures the caller is a registered restaurant.
+    /// @param _restaurantAddress The address to check.
     modifier reqIsRestaurant(address _restaurantAddress) {
         if (restaurantsTokens[_restaurantAddress] == address(0)) {
-            revert ("restaurant is not registered");
+            revert("restaurant is not registered");
         }
         _;
     }
 
-    // Function to register new restaurants. Handles token minting and delegation, keeps 
-    // restaurant count up to date, and then emits the relevant event.
-    function registerRestaurant(string calldata name_, string calldata symbol_) public {
+    constructor() {}
 
+    /**
+     * @notice Registers a new restaurant and mints an associated token.
+     * @dev Assigns a unique SRC20 token to the restaurant and updates the count.
+     * @param name_ The name of the restaurant token.
+     * @param symbol_ The symbol of the restaurant token.
+     */
+    function registerRestaurant(string calldata name_, string calldata symbol_) public {
         //This is a sample - token distribution should ideally be automated around user spend
         //events to give larger portions of the tokens to early/regular spenders, while maintaining
         //a token pool for the restaurant. Currently, the restaurant has to manually handle distribution.
 
         if (restaurantsTokens[msg.sender] != address(0)) {
-            revert ("restaurant already registered");
+            revert("restaurant already registered");
         }
 
-        SRC20 token = new SRC20 (name_, symbol_, 18, saddress(msg.sender), suint(1e24));
+        SRC20 token = new SRC20(name_, symbol_, 18, saddress(msg.sender), suint(1e24));
         restaurantsTokens[msg.sender] = address(token);
 
         restaurantCount++;
@@ -57,11 +72,12 @@ contract OneByTwo{
         emit Register(msg.sender, address(token));
     }
 
-    // Function to recieve payment from customers at restaurants and track spending.
-    // Updates restaurant total revenue and user spendmetrics. Emits the relevant event.
-    // Intended to be called by a customer EOA in return for food.
+    /**
+     * @notice Allows a customer to make a payment at a restaurant.
+     * @dev Updates revenue tracking and mints corresponding tokens to the consumer.
+     * @param restaurant_ The address of the restaurant where payment is made.
+     */
     function spendAtRestaurant(address restaurant_) public payable reqIsRestaurant(restaurant_) {
-
         restaurantTotalRevenue[restaurant_] = restaurantTotalRevenue[restaurant_] + suint256(msg.value);
         customerSpend[restaurant_][msg.sender] = customerSpend[restaurant_][msg.sender] + suint256(msg.value);
 
@@ -77,39 +93,50 @@ contract OneByTwo{
         token.mint(saddress(msg.sender), suint256(tokenAmount));
 
         emit SpentAtRestaurant(restaurant_, msg.sender);
-
     }
 
-    // View function to check the total spend at a given restaurant.
-    // reverts if caller is not a registered restaurant address.
-    function checkTotalSpendRestaurant() public view reqIsRestaurant(msg.sender) returns (uint256){
-        return uint(restaurantTotalRevenue[msg.sender]);
+    /**
+     * @notice Retrieves the total revenue accumulated by the restaurant.
+     * @dev Only callable by the restaurant itself.
+     * @return The total revenue in suint256.
+     */
+    function checkTotalSpendRestaurant() public view reqIsRestaurant(msg.sender) returns (uint256) {
+        return uint256(restaurantTotalRevenue[msg.sender]);
     }
 
-    //View function for a restaurant to check a specific users spend.
-    // reverts if caller is not a registered restaurant address.
-    function checkCustomerSpendRestaurant(address user_) public view reqIsRestaurant(msg.sender) returns (uint256){
-        return uint(customerSpend[msg.sender][user_]);
+    /**
+     * @notice Retrieves the total spending of a specific customer at the caller's restaurant.
+     * @dev Only callable by the restaurant.
+     * @param user_ The address of the customer.
+     * @return The amount spent in suint256.
+     */
+    function checkCustomerSpendRestaurant(address user_) public view reqIsRestaurant(msg.sender) returns (uint256) {
+        return uint256(customerSpend[msg.sender][user_]);
     }
 
-    // View function for a user to check their spend at a given restaurant. 
-    // reverts if caller is not a registered restaurant address.
-    // Note that the resturant can only check their own data
-    function checkSpendCustomer(address restaurant_) public view reqIsRestaurant(restaurant_) returns (uint256){
-        return uint(customerSpend[restaurant_][msg.sender]);
-
+    /**
+     * @notice Retrieves the caller's total spend at a specific restaurant.
+     * @dev Only callable by a customer for a restaurant where they have spent.
+     * @param restaurant_ The address of the restaurant.
+     * @return The amount spent in suint256.
+     */
+    function checkSpendCustomer(address restaurant_) public view reqIsRestaurant(restaurant_) returns (uint256) {
+        return uint256(customerSpend[restaurant_][msg.sender]);
     }
 
-    // checkOut() allows a user to trade in their tokens for a given restaurant
-    // for their respective portion of the revenue pool.
+    /**
+     * @notice Allows a user to exchange restaurant tokens for a portion of the restaurant's revenue.
+     * @dev Transfers tokens back to the restaurant and distributes a proportional revenue share.
+     * @param restaurant_ The address of the restaurant where tokens are redeemed.
+     * @param amount The amount of tokens to redeem, in suint256.
+     */
     function checkOut(address restaurant_, suint256 amount) public reqIsRestaurant(restaurant_) {
-
         address tokenAddress = restaurantsTokens[restaurant_]; // get the address of the restaurant's token
         SRC20 token = SRC20(tokenAddress);
 
         // decrease msg.sender's allowance by amount so they cannot double checkOut
         // note: reverts if amount is more than the user's allowance
-        token.transferFrom(saddress(msg.sender), saddress(restaurant_), amount); 
+        token.transferFrom(saddress(msg.sender), saddress(restaurant_), amount);
 
         // calculate the entitlement
         // entitledShare = amount / suint(token.totalSupply());
@@ -120,17 +147,9 @@ contract OneByTwo{
         uint256 entitlement = uint256(amount * totalRev) / token.totalSupply();
 
         // send the entitlement to the customer
-        bool success = payable(msg.sender).send(uint(entitlement));
+        bool success = payable(msg.sender).send(uint256(entitlement));
         if (!success) {
             revert("Payment Failed");
         }
     }
-
-
-    // TODO: change comments to natspec
-    // TODO: adjust rewards math
-    // requires give early / regular users more rewards
-    // requires tokenomics that make sense for the restaurant, e.g. can withdraw money if restuarent doesn't hold token themselves
-    // requires adjusting test cases to reflect new rewards
-
 }

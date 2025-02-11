@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.27;
 
-import { ISRC20 } from "./ISRC20.sol";
+import {ISRC20} from "./ISRC20.sol";
 
 /*//////////////////////////////////////////////////////////////
 //                         SRC20 Contract
@@ -25,7 +25,7 @@ contract SRC20 is ISRC20 {
     string public name;
     string public symbol;
     uint8 public immutable decimals;
-    saddress internal mintTo; 
+    saddress internal mintTo;
     address public owner;
 
     /*//////////////////////////////////////////////////////////////
@@ -56,20 +56,13 @@ contract SRC20 is ISRC20 {
         return uint256(balance[saddress(msg.sender)]);
     }
 
-    function approve(
-        saddress spender,
-        suint256 amount
-    ) public virtual returns (bool) {
+    function approve(saddress spender, suint256 amount) public virtual returns (bool) {
         _allowance[saddress(msg.sender)][spender] = amount;
         // emit Approval(msg.sender, address(spender), uint256(amount));
         return true;
     }
 
-    function transfer(
-        saddress to,
-        suint256 amount
-    ) public virtual returns (bool) {
-
+    function transfer(saddress to, suint256 amount) public virtual returns (bool) {
         //Prevents token transfer outside of OG restaurant
         if (to != mintTo && saddress(msg.sender) != mintTo) {
             revert("Non-transferable outside of Original Restaurant");
@@ -84,12 +77,7 @@ contract SRC20 is ISRC20 {
         return true;
     }
 
-    function transferFrom(
-        saddress from,
-        saddress to,
-        suint256 amount
-    ) public virtual returns (bool) {
-
+    function transferFrom(saddress from, saddress to, suint256 amount) public virtual returns (bool) {
         //same as in above
         if (to != mintTo && from != mintTo) {
             revert("Non-transferable outside of Original Restaurant");
@@ -103,7 +91,7 @@ contract SRC20 is ISRC20 {
                 }
                 _allowance[from][saddress(msg.sender)] = allowed - amount;
             }
-        }   
+        }
 
         balance[from] -= amount;
         unchecked {
