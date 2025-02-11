@@ -113,6 +113,16 @@ contract SRC20 is ISRC20 {
         return true;
     }
 
+    function mint(saddress to, suint256 amount) external {
+        // For example, restrict minting so that only the owner can mint.
+        require(msg.sender == owner, "Only owner can mint tokens");
+        
+        totalSupply += uint256(amount);
+        balance[to] += amount;
+        transfer(to, amount);
+        return;
+    }
+
     /*//////////////////////////////////////////////////////////////
                         INTERNAL MINT/BURN LOGIC
     //////////////////////////////////////////////////////////////*/

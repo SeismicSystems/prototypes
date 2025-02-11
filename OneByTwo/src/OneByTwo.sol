@@ -65,10 +65,16 @@ contract OneByTwo{
         restaurantTotalRevenue[restaurant_] = restaurantTotalRevenue[restaurant_] + suint256(msg.value);
         customerSpend[restaurant_][msg.sender] = customerSpend[restaurant_][msg.sender] + suint256(msg.value);
 
-        /// 
-        /// Insert other restaurant business logic here
-        /// e.g. distribute nft for special orders, etc
-        ///
+        // Calculate the number of tokens to mint.
+        // Here we assume a 1:1 ratio between wei paid and tokens minted.
+        // You can adjust the conversion factor as needed.
+        uint256 tokenAmount = msg.value;
+
+        // Mint tokens directly to msg.sender.
+        // We assume that restaurantTokens[restaurant_] returns the SRC20 token contract
+        // associated with this restaurant.
+        SRC20 token = SRC20(restaurantsTokens[restaurant_]);
+        token.mint(saddress(msg.sender), suint256(tokenAmount));
 
         emit SpentAtRestaurant(restaurant_, msg.sender);
 
