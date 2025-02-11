@@ -36,5 +36,4 @@ interface ISRC20 {
     function allowance(saddress spender) external view returns (uint256);
     function approve(saddress spender, suint256 amount) external returns (bool);
     function transferFrom(saddress from, saddress to, suint256 amount) external returns (bool);
-    function mint(saddress to, suint256 amount) external; //need to restrict to only specific users
 }

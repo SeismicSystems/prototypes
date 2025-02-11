@@ -105,7 +105,7 @@ contract OneByTwo{
     function checkOut(address restaurant_, suint256 amount) public reqIsRestaurant(restaurant_) {
 
         address tokenAddress = restaurantsTokens[restaurant_]; // get the address of the restaurant's token
-        ISRC20 token = ISRC20(tokenAddress);
+        SRC20 token = SRC20(tokenAddress);
 
         // decrease msg.sender's allowance by amount so they cannot double checkOut
         // note: reverts if amount is more than the user's allowance

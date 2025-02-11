@@ -281,6 +281,7 @@ contract OneByTwoTest is Test {
         uint256 spendAmount = 1 ether;
         address customer = address(0x234);
         address restaurant = address(0x456);
+        vm.deal(customer, 2 ether);
 
         vm.prank(restaurant);
         onebytwo.registerRestaurant("Restaurant One", "RONE");

@@ -27,7 +27,6 @@ contract SRC20 is ISRC20 {
     uint8 public immutable decimals;
     saddress internal mintTo; 
     address public owner;
-    address public authorizedMinter;
 
     /*//////////////////////////////////////////////////////////////
                               ERC20 STORAGE
@@ -114,19 +113,10 @@ contract SRC20 is ISRC20 {
         return true;
     }
 
-    function setAuthorizedMinter(address _minter) external {
-        require(msg.sender == mintTo, "Only original restaurant can set authorized minter");
-        authorizedMinter = _minter;
-    }
-
     function mint(saddress to, suint256 amount) external {
         // For example, restrict minting so that only the owner can mint.
         require(msg.sender == owner, "Only owner can mint tokens");
-        
-        totalSupply += uint256(amount);
-        balance[to] += amount;
-        transfer(to, amount);
-        return;
+        _mint(to, amount);
     }
 
     /*//////////////////////////////////////////////////////////////
