@@ -281,7 +281,7 @@ contract OneByTwoTest is Test {
         uint256 spendAmount = 1 ether;
         address customer = address(0x234);
         address restaurant = address(0x456);
-        vm.deal(customer, 2 ether);
+        vm.deal(customer, 4 ether);
 
         vm.prank(restaurant);
         onebytwo.registerRestaurant("Restaurant One", "RONE");
@@ -353,5 +353,100 @@ contract OneByTwoTest is Test {
         uint256 customerTokenBalanceAfter = token.balanceOf();
 
         assertEq(customerTokenBalanceAfter, 0, "Customer token balance should be zero after checkout");
+
+    }
+
+    function testUserReceivesTokensAndETHRefundMultiple() public {
+        // ----------- STEP 1: Customer Spends at Restaurant -----------
+        // Define how much the customer spends, and where the customer / restaurant are
+        uint256 spendAmount = 1 ether;
+        address customer = address(0x234);
+        address restaurant = address(0x456);
+        vm.deal(customer, 2 ether);
+
+        vm.prank(restaurant);
+        onebytwo.registerRestaurant("Restaurant One", "RONE");
+
+        address tokenAddress = onebytwo.restaurantsTokens(restaurant);
+        ISRC20 token = ISRC20(tokenAddress);
+
+        // Have the customer call spendAtRestaurant sending spendAmount/2 ETH.
+        // This call should update the revenue, track customer spend, and mint tokens to the customer.
+        vm.prank(customer);
+        onebytwo.spendAtRestaurant{value: spendAmount}(restaurant);
+
+        // Verify that the customer received tokens on a 1:1 basis.
+        vm.prank(customer);
+        uint256 cusotmerBalance = token.balanceOf();
+
+        assertEq(cusotmerBalance, spendAmount);
+
+        // Have the customer call spendAtRestaurant a second time, spending spendAmount/2 ETH.
+        vm.prank(customer);
+        onebytwo.spendAtRestaurant{value: spendAmount}(restaurant);
+
+        // Verify that the customer received tokens OVER a 1:1 basis.
+        vm.prank(customer);
+        cusotmerBalance = token.balanceOf();
+        assert(cusotmerBalance > spendAmount*2);
+
+    }
+
+        function testUserTokenHoldingIsMultiplicative() public {
+        // ----------- STEP 1: Customer Spends at Restaurant -----------
+        // Define how much the customer spends, and where the customer / restaurant are
+        uint256 spendAmount = 1 ether;
+        address customer = address(0x234);
+        address customer2 = address(0x345);
+        address restaurant = address(0x456);
+        vm.deal(customer, 4 ether);
+        vm.deal(customer2, 4 ether);
+
+        vm.prank(restaurant);
+        onebytwo.registerRestaurant("Restaurant One", "RONE");
+
+        address tokenAddress = onebytwo.restaurantsTokens(restaurant);
+        ISRC20 token = ISRC20(tokenAddress);
+
+        // Have the customer call spendAtRestaurant sending spendAmount/2 ETH.
+        // This call should update the revenue, track customer spend, and mint tokens to the customer.
+        vm.prank(customer);
+        onebytwo.spendAtRestaurant{value: spendAmount/2}(restaurant);
+
+        vm.prank(customer2);
+        onebytwo.spendAtRestaurant{value: spendAmount/2}(restaurant);
+
+        // Verify that the customer received tokens on a 1:1 basis.
+        vm.prank(customer);
+        uint256 cusotmerBalance = token.balanceOf();
+
+        assertEq(cusotmerBalance, spendAmount/2);
+
+        vm.prank(customer2);
+        uint256 cusotmer2Balance = token.balanceOf();
+
+        assertEq(cusotmer2Balance, spendAmount/2);
+
+        // Have customer2 cash out half of their tokens
+        vm.prank(customer2);
+        onebytwo.checkOut(restaurant, suint256(cusotmer2Balance/2));
+
+        // Have the customer call spendAtRestaurant a second time, spending spendAmount/2 ETH.
+        vm.prank(customer);
+        onebytwo.spendAtRestaurant{value: spendAmount/2}(restaurant);
+
+        vm.prank(customer2);
+        onebytwo.spendAtRestaurant{value: spendAmount/2}(restaurant);
+
+        // Verify that the customer received tokens OVER a 1:1 basis.
+        vm.prank(customer);
+        cusotmerBalance = token.balanceOf();
+
+        vm.prank(customer2);
+        cusotmer2Balance = token.balanceOf();
+
+        assert(cusotmerBalance > cusotmer2Balance);
+
+
     }
 }

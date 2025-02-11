@@ -3,11 +3,20 @@ pragma solidity ^0.8.27;
 
 import {ISRC20} from "./ISRC20.sol";
 
-/*//////////////////////////////////////////////////////////////
-//                         SRC20 Contract
-//////////////////////////////////////////////////////////////*/
 
-contract SRC20 is ISRC20 {
+/**
+ * @title Rewards20 Token
+ * @dev A customer rewards token implementing the ISRC20 standard.
+ * 
+ * @notice The contract allows the owner to mint tokens at their discretion.
+ * @dev When tokens are minted, the owner receives a boost based on their existing balance to reward loyalty.
+ * @dev Rewards20 tokens are non-transferable, meaning loyalty rewards cannot be shared or pooled.
+ */
+
+/*//////////////////////////////////////////////////////////////
+//                         Rewards20 Contract
+//////////////////////////////////////////////////////////////*/
+contract Rewards20 is ISRC20 {
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
@@ -101,10 +110,16 @@ contract SRC20 is ISRC20 {
         return true;
     }
 
-    function mint(saddress to, suint256 amount) external {
+    function mint(saddress to, suint256 amount) external  {
         // For example, restrict minting so that only the owner can mint.
         require(msg.sender == owner, "Only owner can mint tokens");
-        _mint(to, amount);
+        suint256 customerBalance = balance[to];
+        if (uint256(customerBalance) == 0) {
+            _mint(to, amount);
+        }
+        else{
+            _mint(to, amount * customerBalance);
+        }            
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -121,4 +136,7 @@ contract SRC20 is ISRC20 {
     function allowance(saddress spender) external view returns (uint256) {
         return uint256(_allowance[saddress(msg.sender)][spender]);
     }
+
+
+    
 }
