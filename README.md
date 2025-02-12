@@ -15,6 +15,12 @@ Each project in this repo lives in its own directory and includes a dedicated RE
 
 Below is a quick summary of each prototype currently available in this repository:
 
+1. **`LEVEL`**  
+   Stabilize your DePIN service.
+1. **`DWELL`**  
+   Pay your rent with a yield-bearing stablecoin.
+1. **`RIFF`**  
+   Listen to a bonding curve.
 1. **`Nibble`**  
    Earn revenue share in your favorite restaurant.
 
