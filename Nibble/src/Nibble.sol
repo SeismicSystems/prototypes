@@ -15,7 +15,7 @@ This rewards customers for spending early and often, as repeated spends will gro
 faster than infrequent, larger spends. It also encourages holding of tokens rather than immediately cashing out.
 */
 
-contract OneByTwo {
+contract Nibble {
     /// @notice The total number of registered restaurants.
     uint256 public restaurantCount;
 

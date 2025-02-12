@@ -2,40 +2,40 @@
 pragma solidity ^0.8.13;
 
 import {Test, console, Vm} from "forge-std/Test.sol";
-import {OneByTwo} from "../src/OneByTwo.sol";
+import {Nibble} from "../src/Nibble.sol";
 import {ISRC20} from "../src/ISRC20.sol";
 
-contract OneByTwoTest is Test {
-    OneByTwo public onebytwo;
+contract NibbleTest is Test {
+    Nibble public nibble;
 
     // Declare event types for use in event emission tests.
     event Register(address Restaurant_, address tokenAddress);
     event SpentAtRestaurant(address Restaurant_, address Consumer_);
 
     function setUp() public {
-        onebytwo = new OneByTwo();
+        nibble = new Nibble();
     }
 
     /// @notice Ensure that the restaurant count increases upon registration.
     function test_oneNewRestaurant() public {
-        uint256 start = onebytwo.restaurantCount();
+        uint256 start = nibble.restaurantCount();
         assertEq(start, 0);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
-        uint256 finish = onebytwo.restaurantCount();
+        nibble.registerRestaurant("Restaurant One", "RONE");
+        uint256 finish = nibble.restaurantCount();
         assertEq(finish, 1);
     }
 
     /// @notice A restaurant should not be able to register twice.
     function test_registerRestaurantTwice() public {
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
         vm.expectRevert("restaurant already registered");
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
     }
 
     /// @notice After registration, the restaurant’s token address should be set.
     function test_restaurantTokenMapping() public {
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
-        address tokenAddress = onebytwo.restaurantsTokens(address(this));
+        nibble.registerRestaurant("Restaurant One", "RONE");
+        address tokenAddress = nibble.restaurantsTokens(address(this));
         assertTrue(tokenAddress != address(0), "Token address should not be zero");
     }
 
@@ -43,7 +43,7 @@ contract OneByTwoTest is Test {
     function test_spendAtRestaurantRevertsForNonRegisteredRestaurant() public {
         address unregisteredRestaurant = address(0x123);
         vm.expectRevert("restaurant is not registered");
-        onebytwo.spendAtRestaurant(unregisteredRestaurant);
+        nibble.spendAtRestaurant(unregisteredRestaurant);
     }
 
     /// @notice Spending at a registered restaurant updates revenue and Customer spend correctly.
@@ -51,28 +51,28 @@ contract OneByTwoTest is Test {
         // Use a different address for the restaurant.
         address restaurant = address(0x123);
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
         // Simulate a consumer spending 1 ether at the restaurant.
         address consumer = address(0x234);
         vm.deal(consumer, 2 ether);
         uint256 spendAmount = 1 ether;
         vm.prank(consumer);
-        onebytwo.spendAtRestaurant{value: spendAmount}(restaurant);
+        nibble.spendAtRestaurant{value: spendAmount}(restaurant);
 
         // Check the restaurant’s total revenue (only a registered restaurant can call this).
         vm.prank(restaurant);
-        uint256 totalRevenue = onebytwo.checkTotalSpendRestaurant();
+        uint256 totalRevenue = nibble.checkTotalSpendRestaurant();
         assertEq(totalRevenue, spendAmount);
 
         // Check that the restaurant can view this consumer’s spend.
         vm.prank(restaurant);
-        uint256 CustomerSpendAmount = onebytwo.checkCustomerSpendRestaurant(consumer);
+        uint256 CustomerSpendAmount = nibble.checkCustomerSpendRestaurant(consumer);
         assertEq(CustomerSpendAmount, spendAmount);
 
         // Check that the consumer can view his/her spend at the restaurant.
         vm.prank(consumer);
-        uint256 spendCustomer = onebytwo.checkSpendCustomer(restaurant);
+        uint256 spendCustomer = nibble.checkSpendCustomer(restaurant);
         assertEq(spendCustomer, spendAmount);
     }
 
@@ -80,27 +80,27 @@ contract OneByTwoTest is Test {
     function test_multipleSpendsAccumulate() public {
         address restaurant = address(0x123);
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
         address consumer = address(0x234);
         vm.deal(consumer, 4 ether);
         uint256 spend1 = 1 ether;
         uint256 spend2 = 2 ether;
         vm.prank(consumer);
-        onebytwo.spendAtRestaurant{value: spend1}(restaurant);
+        nibble.spendAtRestaurant{value: spend1}(restaurant);
         vm.prank(consumer);
-        onebytwo.spendAtRestaurant{value: spend2}(restaurant);
+        nibble.spendAtRestaurant{value: spend2}(restaurant);
 
         vm.prank(restaurant);
-        uint256 totalRevenue = onebytwo.checkTotalSpendRestaurant();
+        uint256 totalRevenue = nibble.checkTotalSpendRestaurant();
         assertEq(totalRevenue, spend1 + spend2);
 
         vm.prank(restaurant);
-        uint256 CustomerSpendAmount = onebytwo.checkCustomerSpendRestaurant(consumer);
+        uint256 CustomerSpendAmount = nibble.checkCustomerSpendRestaurant(consumer);
         assertEq(CustomerSpendAmount, spend1 + spend2);
 
         vm.prank(consumer);
-        uint256 spendCustomer = onebytwo.checkSpendCustomer(restaurant);
+        uint256 spendCustomer = nibble.checkSpendCustomer(restaurant);
         assertEq(spendCustomer, spend1 + spend2);
     }
 
@@ -108,7 +108,7 @@ contract OneByTwoTest is Test {
     function test_multipleDifSpendsAccumulate() public {
         address restaurant = address(0x123);
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
         address consumer = address(0x234);
         address consumer2 = address(0x2345);
@@ -119,60 +119,60 @@ contract OneByTwoTest is Test {
         uint256 spend2 = 2 ether;
 
         vm.prank(consumer);
-        onebytwo.spendAtRestaurant{value: spend1}(restaurant);
+        nibble.spendAtRestaurant{value: spend1}(restaurant);
         vm.prank(consumer);
-        onebytwo.spendAtRestaurant{value: spend2}(restaurant);
+        nibble.spendAtRestaurant{value: spend2}(restaurant);
 
         vm.prank(consumer2);
-        onebytwo.spendAtRestaurant{value: spend1}(restaurant);
+        nibble.spendAtRestaurant{value: spend1}(restaurant);
         vm.prank(consumer2);
-        onebytwo.spendAtRestaurant{value: spend2}(restaurant);
+        nibble.spendAtRestaurant{value: spend2}(restaurant);
 
         vm.prank(restaurant);
-        uint256 totalRevenue = onebytwo.checkTotalSpendRestaurant();
+        uint256 totalRevenue = nibble.checkTotalSpendRestaurant();
         assertEq(totalRevenue, 2 * (spend1 + spend2));
 
         vm.prank(restaurant);
-        uint256 CustomerSpendAmount = onebytwo.checkCustomerSpendRestaurant(consumer);
+        uint256 CustomerSpendAmount = nibble.checkCustomerSpendRestaurant(consumer);
         assertEq(CustomerSpendAmount, spend1 + spend2);
 
         vm.prank(restaurant);
-        uint256 CustomerSpendAmount2 = onebytwo.checkCustomerSpendRestaurant(consumer2);
+        uint256 CustomerSpendAmount2 = nibble.checkCustomerSpendRestaurant(consumer2);
         assertEq(CustomerSpendAmount2, spend1 + spend2);
 
         vm.prank(consumer);
-        uint256 spendCustomer = onebytwo.checkSpendCustomer(restaurant);
+        uint256 spendCustomer = nibble.checkSpendCustomer(restaurant);
         assertEq(spendCustomer, spend1 + spend2);
 
         vm.prank(consumer2);
-        uint256 spendCustomer2 = onebytwo.checkSpendCustomer(restaurant);
+        uint256 spendCustomer2 = nibble.checkSpendCustomer(restaurant);
         assertEq(spendCustomer2, spend1 + spend2);
     }
 
     /// @notice Only a registered restaurant can call checkTotalSpendRestaurant.
     function test_checkTotalSpendRestaurantNonRegistered() public {
         vm.expectRevert("restaurant is not registered");
-        onebytwo.checkTotalSpendRestaurant();
+        nibble.checkTotalSpendRestaurant();
     }
 
     /// @notice Only a registered restaurant can call checkCustomerSpendRestaurant.
     function test_checkCustomerSpendRestaurantNonRegistered() public {
         vm.expectRevert("restaurant is not registered");
-        onebytwo.checkCustomerSpendRestaurant(address(0x234));
+        nibble.checkCustomerSpendRestaurant(address(0x234));
     }
 
     /// @notice A consumer calling checkSpendCustomer for an unregistered restaurant should revert.
     function test_checkSpendCustomerNonRegisteredRestaurant() public {
         address unregisteredRestaurant = address(0x123);
         vm.expectRevert("restaurant is not registered");
-        onebytwo.checkSpendCustomer(unregisteredRestaurant);
+        nibble.checkSpendCustomer(unregisteredRestaurant);
     }
 
     /// @notice Test that the SpentAtRestaurant event is emitted with the correct parameters.
     function test_spentAtRestaurantEmitsEvent() public {
         address restaurant = address(0x123);
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
         address consumer = address(0x234);
         vm.deal(consumer, 2 ether);
@@ -183,14 +183,14 @@ contract OneByTwoTest is Test {
         emit SpentAtRestaurant(restaurant, consumer);
 
         vm.prank(consumer);
-        onebytwo.spendAtRestaurant{value: spendAmount}(restaurant);
+        nibble.spendAtRestaurant{value: spendAmount}(restaurant);
     }
 
     /// @notice Test that the Register event is emitted when a restaurant registers.
     function test_registerRestaurantEmitsEvent() public {
         // Record logs so that we can inspect emitted events.
         vm.recordLogs();
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
         Vm.Log[] memory entries = vm.getRecordedLogs();
         bool found = false;
         // Compute the expected signature of the Register event.
@@ -211,12 +211,12 @@ contract OneByTwoTest is Test {
     function test_sendTokens() public {
         address restaurant = address(0x123);
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
         address consumer = address(0x234);
         vm.deal(consumer, 2 ether);
 
-        address tokenAddress = onebytwo.restaurantsTokens(restaurant);
+        address tokenAddress = nibble.restaurantsTokens(restaurant);
         ISRC20 token = ISRC20(tokenAddress);
 
         vm.prank(restaurant);
@@ -230,13 +230,13 @@ contract OneByTwoTest is Test {
     function test_sendTokensIllegal() public {
         address restaurant = address(0x123);
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
         address consumer = address(0x234);
         address consumer2 = address(0x456);
         vm.deal(consumer, 2 ether);
 
-        address tokenAddress = onebytwo.restaurantsTokens(restaurant);
+        address tokenAddress = nibble.restaurantsTokens(restaurant);
         ISRC20 token = ISRC20(tokenAddress);
 
         vm.prank(restaurant);
@@ -254,16 +254,16 @@ contract OneByTwoTest is Test {
     function test_checkOutNoTokens() public {
         address restaurant = address(0x123);
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
         address buyer = address(0x234);
         address holder = address(0x456);
 
         vm.deal(buyer, 2 ether);
         vm.prank(buyer);
-        onebytwo.spendAtRestaurant{value: 1 ether}(restaurant);
+        nibble.spendAtRestaurant{value: 1 ether}(restaurant);
 
-        address tokenAddress = onebytwo.restaurantsTokens(restaurant);
+        address tokenAddress = nibble.restaurantsTokens(restaurant);
         ISRC20 token = ISRC20(tokenAddress);
 
         vm.prank(holder);
@@ -272,7 +272,7 @@ contract OneByTwoTest is Test {
 
         vm.prank(holder);
         vm.expectRevert();
-        onebytwo.checkOut(restaurant, suint256(5e8));
+        nibble.checkOut(restaurant, suint256(5e8));
     }
 
     function testUserReceivesTokensAndETHRefund() public {
@@ -284,15 +284,15 @@ contract OneByTwoTest is Test {
         vm.deal(customer, 4 ether);
 
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
-        address tokenAddress = onebytwo.restaurantsTokens(restaurant);
+        address tokenAddress = nibble.restaurantsTokens(restaurant);
         ISRC20 token = ISRC20(tokenAddress);
 
         // Have the customer call spendAtRestaurant sending spendAmount ETH.
         // This call should update the revenue, track customer spend, and mint tokens to the customer.
         vm.prank(customer);
-        onebytwo.spendAtRestaurant{value: spendAmount}(restaurant);
+        nibble.spendAtRestaurant{value: spendAmount}(restaurant);
 
         // Verify that the customer received tokens on a 1:1 basis.
 
@@ -302,20 +302,20 @@ contract OneByTwoTest is Test {
         assertEq(cusotmerBalance, spendAmount);
 
         // ----------- STEP 2: Approve and Call checkOut -----------
-        // Before checking out, the customer must allow the OneByTwo contract to transfer tokens
+        // Before checking out, the customer must allow the Nibble contract to transfer tokens
         // on their behalf via the token’s transferFrom.
         vm.prank(customer);
-        token.approve(saddress(onebytwo), suint256(cusotmerBalance));
+        token.approve(saddress(nibble), suint256(cusotmerBalance));
 
         // Record ETH balances for later assertions.
-        uint256 oneByTwoBalanceBefore = address(onebytwo).balance;
+        uint256 nibbleBalanceBefore = address(nibble).balance;
         uint256 customerEthBefore = customer.balance;
 
         // The customer now calls checkOut to trade in their tokens for an ETH payback.
         // Note: checkOut accepts a parameter of type suint256; here we assume that casting
         // the uint256 value to suint256 works in your code.
         vm.prank(customer);
-        onebytwo.checkOut(restaurant, suint256(cusotmerBalance));
+        nibble.checkOut(restaurant, suint256(cusotmerBalance));
 
         // ----------- STEP 3: Calculate and Verify the ETH Refund -----------
         // In checkOut the entitlement is computed as:
@@ -328,15 +328,15 @@ contract OneByTwoTest is Test {
         uint256 tokenTotalSupply = token.totalSupply();
         uint256 expectedEntitlement = (cusotmerBalance * totalRev) / tokenTotalSupply;
 
-        // The OneByTwo contract should have sent the expectedEntitlement to the customer.
-        uint256 oneByTwoBalanceAfter = address(onebytwo).balance;
+        // The Nibble contract should have sent the expectedEntitlement to the customer.
+        uint256 nibbleBalanceAfter = address(nibble).balance;
         uint256 customerEthAfter = customer.balance;
 
-        // Verify that OneByTwo's ETH balance decreased by expectedEntitlement.
+        // Verify that Nibble's ETH balance decreased by expectedEntitlement.
         assertEq(
-            oneByTwoBalanceAfter,
-            oneByTwoBalanceBefore - expectedEntitlement,
-            "OneByTwo ETH balance should decrease by the expected entitlement"
+            nibbleBalanceAfter,
+            nibbleBalanceBefore - expectedEntitlement,
+            "Nibble ETH balance should decrease by the expected entitlement"
         );
 
         // Verify that the customer's ETH balance increased by the expected entitlement.
@@ -365,15 +365,15 @@ contract OneByTwoTest is Test {
         vm.deal(customer, 2 ether);
 
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
-        address tokenAddress = onebytwo.restaurantsTokens(restaurant);
+        address tokenAddress = nibble.restaurantsTokens(restaurant);
         ISRC20 token = ISRC20(tokenAddress);
 
         // Have the customer call spendAtRestaurant sending spendAmount/2 ETH.
         // This call should update the revenue, track customer spend, and mint tokens to the customer.
         vm.prank(customer);
-        onebytwo.spendAtRestaurant{value: spendAmount}(restaurant);
+        nibble.spendAtRestaurant{value: spendAmount}(restaurant);
 
         // Verify that the customer received tokens on a 1:1 basis.
         vm.prank(customer);
@@ -383,7 +383,7 @@ contract OneByTwoTest is Test {
 
         // Have the customer call spendAtRestaurant a second time, spending spendAmount/2 ETH.
         vm.prank(customer);
-        onebytwo.spendAtRestaurant{value: spendAmount}(restaurant);
+        nibble.spendAtRestaurant{value: spendAmount}(restaurant);
 
         // Verify that the customer received tokens OVER a 1:1 basis.
         vm.prank(customer);
@@ -403,18 +403,18 @@ contract OneByTwoTest is Test {
         vm.deal(customer2, 4 ether);
 
         vm.prank(restaurant);
-        onebytwo.registerRestaurant("Restaurant One", "RONE");
+        nibble.registerRestaurant("Restaurant One", "RONE");
 
-        address tokenAddress = onebytwo.restaurantsTokens(restaurant);
+        address tokenAddress = nibble.restaurantsTokens(restaurant);
         ISRC20 token = ISRC20(tokenAddress);
 
         // Have the customer call spendAtRestaurant sending spendAmount/2 ETH.
         // This call should update the revenue, track customer spend, and mint tokens to the customer.
         vm.prank(customer);
-        onebytwo.spendAtRestaurant{value: spendAmount/2}(restaurant);
+        nibble.spendAtRestaurant{value: spendAmount/2}(restaurant);
 
         vm.prank(customer2);
-        onebytwo.spendAtRestaurant{value: spendAmount/2}(restaurant);
+        nibble.spendAtRestaurant{value: spendAmount/2}(restaurant);
 
         // Verify that the customer received tokens on a 1:1 basis.
         vm.prank(customer);
@@ -429,14 +429,14 @@ contract OneByTwoTest is Test {
 
         // Have customer2 cash out half of their tokens
         vm.prank(customer2);
-        onebytwo.checkOut(restaurant, suint256(cusotmer2Balance/2));
+        nibble.checkOut(restaurant, suint256(cusotmer2Balance/2));
 
         // Have the customer call spendAtRestaurant a second time, spending spendAmount/2 ETH.
         vm.prank(customer);
-        onebytwo.spendAtRestaurant{value: spendAmount/2}(restaurant);
+        nibble.spendAtRestaurant{value: spendAmount/2}(restaurant);
 
         vm.prank(customer2);
-        onebytwo.spendAtRestaurant{value: spendAmount/2}(restaurant);
+        nibble.spendAtRestaurant{value: spendAmount/2}(restaurant);
 
         // Verify that the customer received tokens OVER a 1:1 basis.
         vm.prank(customer);

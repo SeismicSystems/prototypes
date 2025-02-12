@@ -15,8 +15,8 @@ Each project in this repo lives in its own directory and includes a dedicated RE
 
 Below is a quick summary of each prototype currently available in this repository:
 
-1. **`OneByTwo`**  
-   Revenue share for restaurant regulars.
+1. **`Nibble`**  
+   Earn revenue share in your favorite restaurant.
 
 ## Contributing
 
