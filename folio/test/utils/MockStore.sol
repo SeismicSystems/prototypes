@@ -6,12 +6,12 @@ import {Test, console} from "forge-std/Test.sol";
 
 contract MockStore is IStoreFront {
 
-    // fullfilling the IStoreFront interface
+    // fulfilling the IStoreFront interface
     function purchase(suint prodId) external payable override {
         console.log("entered purchase");
     }
 
-    // recieving external payments
+    // receiving external payments
     // this is neeeded for testing if a business can recieve a payout for winning the competition
     receive() external payable {
         console.log("received");
