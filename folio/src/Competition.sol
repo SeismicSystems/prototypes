@@ -20,7 +20,7 @@ contract Competition {
      * @dev Initializes the public variables determining the competition framework including:
      * Setting the percent portion each group (participant, business, charity) gets of the prize pool
      * Setting the amount of eth per transaction that will be added to the prize pot
-     * Setting up the phases of the competiton and the starting time and duration the competition will run for
+     * Setting up the phases of the competition and the starting time and duration the competition will run for
      */
     uint256 public constant participantPerc = 50;
     uint256 public constant businessPerc = 15;
@@ -31,7 +31,7 @@ contract Competition {
     uint256 public duration = 2592000; //this should be read as seconds, i.e. 2592000 seconds = 30 days
 
     /**
-     * @notice Internal variables used for storing relevant competiton information.
+     * @notice Internal variables used for storing relevant competition information.
      * @dev Initializes the variables assisting the competition, including:
      * Determining a single link's worth of payout at the end of a competition for participants and businesses
      * Determining the amount being donated to a charity
