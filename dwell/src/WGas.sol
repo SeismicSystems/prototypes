@@ -20,9 +20,6 @@ contract WGas is Context, ISRC20, ISRC20Metadata, IERC20Errors {
 
     uint256 private _totalSupply;
 
-    string private _name = "Wrapped Gas";
-    string private _symbol = "WGAS";
-
     /**
      * @dev Returns the name of the token.
      */
@@ -35,7 +32,7 @@ contract WGas is Context, ISRC20, ISRC20Metadata, IERC20Errors {
      * name.
      */
     function symbol() public view virtual returns (string memory) {
-        return _symbol;
+        return "WGAS";
     }
 
     /**
@@ -59,7 +56,7 @@ contract WGas is Context, ISRC20, ISRC20Metadata, IERC20Errors {
      * @dev See {ISRC20-totalSupply}.
      */
     function totalSupply() public view virtual returns (uint256) {
-        return _totalSupply;
+        return 0;
     }
 
     /**
@@ -67,7 +64,6 @@ contract WGas is Context, ISRC20, ISRC20Metadata, IERC20Errors {
      * Reverts if caller is not the account owner to maintain privacy.
      */
     function balanceOf(saddress account) public view virtual override returns (uint256) {
-        require(false, "test");
         if (account == saddress(_msgSender())) {
             return uint256(_balances[account]);
         }
