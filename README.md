@@ -30,6 +30,13 @@ If you've already [installed](https://docs.seismic.systems/onboarding/publish-yo
 sforge test
 ```
 
+> [!NOTE]
+> **Known incompatibility with the current public toolchain.** `ssolc 0.8.31` rejects
+> [shielded types as mapping keys](https://docs.seismic.systems/onchain/concepts/type-system),
+> and all five prototypes declare `mapping(saddress => ...)` (17 occurrences across 8 files).
+> `sforge build` and `sforge test` therefore fail out of the box with `Error (10109)`.
+> Tracked in [#10](https://github.com/SeismicSystems/prototypes/issues/10).
+
 ## Contributing
 
 1. **Fork** this repository.
