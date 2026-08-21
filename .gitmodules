@@ -26,3 +26,6 @@
 [submodule "riff/lib/solmate"]
 	path = riff/lib/solmate
 	url = https://github.com/Rari-Capital/solmate
+[submodule "veil/lib/forge-std"]
+	path = veil/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std

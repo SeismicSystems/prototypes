@@ -24,6 +24,8 @@ Below is a quick summary of each prototype currently available in this repositor
    Participate in a global pay-it-forward chain.
 1. **`NIBBLE`**  
    Earn revenue share in your favorite restaurant.
+1. **`VEIL`**  
+   Win a raffle no one can rig, and no one can trace back to you.
 
 If you've already [installed](https://docs.seismic.systems/onboarding/publish-your-docs) Seismic on your local machine, you can `cd` into each directory and run
 ```
